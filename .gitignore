@@ -1,0 +1,4 @@
+*.nro
+*.elf
+bin/
+obj/

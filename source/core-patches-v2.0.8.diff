@@ -1,0 +1,386 @@
+diff --git a/ladxhd_game_source_code/ProjectZ.Core/Game1.cs b/ladxhd_game_source_code/ProjectZ.Core/Game1.cs
+index 518a7c4..09743eb 100644
+--- a/ladxhd_game_source_code/ProjectZ.Core/Game1.cs
++++ b/ladxhd_game_source_code/ProjectZ.Core/Game1.cs
+@@ -48,6 +48,26 @@ namespace ProjectZ
+ 
+         public static int WindowWidth;
+         public static int WindowHeight;
++
++        /// <summary>
++        /// Desacopla la resolucion a la que se RENDERIZA del tamano del panel.
++        ///
++        /// Sin esto, WindowWidth/Height se recalculan cada frame desde ClientBounds (o desde
++        /// los PresentationParameters), asi que cualquier valor propio se revierte al frame
++        /// siguiente. Con el override, MainRenderTarget y los render targets del blur se
++        /// dimensionan al valor dado y el blit final los estira al backbuffer, que es un
++        /// camino que el juego ya recorre.
++        ///
++        /// Lo usa el port de Switch para dos cosas:
++        ///  - Escala de resolucion: en Tegra X1 el cuello medido es de ancho de banda de
++        ///    memoria (la RAM overclockeada da tanto como la GPU), y renderizar a menos
++        ///    pixeles lo baja proporcionalmente.
++        ///  - Modo Flip Grip: la ranura del juego en el lienzo vertical es 720x720, no la
++        ///    forma del panel.
++        ///
++        /// null = comportamiento original.
++        /// </summary>
++        public static Point? RenderSizeOverride;
+         public static int WindowWidthEnd;
+         public static int WindowHeightEnd;
+         public static int RenderWidth;
+@@ -76,6 +96,16 @@ namespace ProjectZ
+         private static RenderTarget2D _renderTarget1;
+         private static RenderTarget2D _renderTarget2;
+         private static RenderTarget2D _finalRenderTarget;
++
++        /// <summary>
++        /// El frame ya compuesto, justo antes de presentarlo. Solo lectura.
++        ///
++        /// Lo usa el modo Flip Grip del port de Switch: en vez de re-dibujar nada, recoge
++        /// este render target y lo compone rotado 270 sobre el lienzo vertical. Es el mismo
++        /// modelo que el compositor donante: se rota UNA vez, al final, y nada aguas arriba
++        /// sabe que hay una rotacion.
++        /// </summary>
++        public static RenderTarget2D FinalRenderTarget => _finalRenderTarget;
+         private static bool _initRenderTargets;
+ 
+         private const double _startDelayTime = 1.5;
+@@ -84,6 +114,9 @@ namespace ProjectZ
+ 
+         public static int MaxGameScale;
+         public static int UiScale;
++
++        /// <summary>Ver el calculo de interfaceScale en ApplyScaleChange: permite redondear la escala de UI hacia arriba.</summary>
++        public static bool UiScaleRoundUp;
+         public static bool ScaleChanged;
+ 
+         public static bool WasActive;
+@@ -389,7 +422,13 @@ namespace ProjectZ
+                 WindowHeightEnd = 0;
+             }
+ 
+-            if (GraphicsCapabilities.UsePresentationParametersForSize && Graphics.GraphicsDevice != null)
++            if (RenderSizeOverride.HasValue)
++            {
++                // Ver la nota en la declaracion de RenderSizeOverride.
++                if (WindowWidth != RenderSizeOverride.Value.X || WindowHeight != RenderSizeOverride.Value.Y)
++                    RefreshPresentationSize();
++            }
++            else if (GraphicsCapabilities.UsePresentationParametersForSize && Graphics.GraphicsDevice != null)
+             {
+                 var pp = Graphics.GraphicsDevice.PresentationParameters;
+                 if (WindowWidth != pp.BackBufferWidth || WindowHeight != pp.BackBufferHeight)
+@@ -767,9 +806,22 @@ namespace ProjectZ
+             if (Graphics.GraphicsDevice == null)
+                 return;
+ 
+-            var pp = Graphics.GraphicsDevice.PresentationParameters;
+-            w = pp.BackBufferWidth;
+-            h = pp.BackBufferHeight;
++            if (RenderSizeOverride.HasValue)
++            {
++                // Ver la nota en la declaracion de RenderSizeOverride. Esta era la unica ruta
++                // que seguia leyendo el backbuffer: al morir o cargar partida el juego pasa
++                // por aqui y dejaba WindowWidth/Height en 1920x1080 con la ranura FLIP en
++                // 1080x810 -> camara, HUD y escala descuadrados hasta el siguiente
++                // ForceRecalculateScaling.
++                w = RenderSizeOverride.Value.X;
++                h = RenderSizeOverride.Value.Y;
++            }
++            else if (Graphics.GraphicsDevice != null)
++            {
++                var pp = Graphics.GraphicsDevice.PresentationParameters;
++                w = pp.BackBufferWidth;
++                h = pp.BackBufferHeight;
++            }
+ 
+             if (w <= 0 || h <= 0)
+             {
+@@ -790,7 +842,12 @@ namespace ProjectZ
+         public void ForceRecalculateScaling()
+         {
+             int w = 0, h = 0;
+-            if (GraphicsCapabilities.UsePresentationParametersForSize && Graphics.GraphicsDevice != null)
++            if (RenderSizeOverride.HasValue)
++            {
++                w = RenderSizeOverride.Value.X;
++                h = RenderSizeOverride.Value.Y;
++            }
++            else if (GraphicsCapabilities.UsePresentationParametersForSize && Graphics.GraphicsDevice != null)
+             {
+                 var pp = Graphics.GraphicsDevice.PresentationParameters;
+                 w = pp.BackBufferWidth;
+@@ -868,7 +925,14 @@ namespace ProjectZ
+                 }
+             }
+             // Scale of the user interface.
+-            int interfaceScale = MathHelper.Clamp(Math.Min(WindowWidth / Values.MinWidth, WindowHeight / Values.MinHeight), 1, 11);
++            // Tope de escala de UI. Por defecto redondea hacia abajo (la UI nunca se sale).
++            // Con UiScaleRoundUp la plataforma permite subir un paso cuando el ajuste
++            // fraccionario pasa de 0.8: a 720x540 (Flip Grip) 1.89 -> 2 en vez de 1, a costa
++            // de que un menu de 380 px logicos se salga ~5% por cada lado. Opt-in del port.
++            float fitW = WindowWidth / (float)Values.MinWidth;
++            float fitH = WindowHeight / (float)Values.MinHeight;
++            float fit = Math.Min(fitW, fitH);
++            int interfaceScale = MathHelper.Clamp((int)fit + (UiScaleRoundUp && fit - (int)fit >= 0.8f ? 1 : 0), 1, 11);
+ 
+             if (GameSettings.UiScale > interfaceScale)
+                 UiScale = interfaceScale;
+diff --git a/ladxhd_game_source_code/ProjectZ.Core/InGame/Map/DiscoveryFog.cs b/ladxhd_game_source_code/ProjectZ.Core/InGame/Map/DiscoveryFog.cs
+index 8db05ec..55f3306 100644
+--- a/ladxhd_game_source_code/ProjectZ.Core/InGame/Map/DiscoveryFog.cs
++++ b/ladxhd_game_source_code/ProjectZ.Core/InGame/Map/DiscoveryFog.cs
+@@ -47,6 +47,15 @@ namespace ProjectZ.InGame.Map
+         private bool[,] _nodeDirty;
+         private bool _maskDirty = true;
+         private bool _fullyRevealed;
++
++        // Caja envolvente de los nodos que TIENEN niebla (fog > 0), recalculada en UploadMask.
++        // Sirve para dibujar solo esa parte en vez de toda la rejilla: la niebla es un unico
++        // quad con alpha blending, o sea coste de fill rate puro, y en una zona mayormente
++        // explorada casi todo el quad es alpha 0 que igualmente hay que mezclar.
++        // Medido en Switch: la niebla costaba ~4 ms por frame (45-47 fps -> 38).
++        // Si no hay ningun nodo con niebla, _fogBoxEmpty queda true y no se dibuja nada.
++        private int _fogMinX, _fogMinY, _fogMaxX, _fogMaxY;
++        private bool _fogBoxEmpty = true;
+         public float _sharpPercentage;
+ 
+         // Whether the fog is currently freezing objects. Resolved once per frame in Update so
+@@ -166,18 +175,35 @@ namespace ProjectZ.InGame.Map
+ 
+             UploadMask();
+ 
++            // Nada con niebla: no hay nada que mezclar.
++            if (_fogBoxEmpty)
++                return;
++
++            // Dibujar solo la caja con niebla, mas un nodo de margen a cada lado (que es lo
++            // que hacia el codigo original con su +2 / -1 sobre la rejilla entera). Ese margen
++            // es el que produce el degradado en el borde: al muestrear con LinearClamp toma el
++            // valor del nodo vecino, que es justo lo que se quiere.
++            //
++            // Cuando la caja cubre toda la rejilla esto da EXACTAMENTE los mismos rectangulos
++            // que antes, asi que el resultado visual no cambia; solo se ahorra relleno cuando
++            // parte del mapa ya esta descubierto.
++            var nodeX0 = _fogMinX - 1;
++            var nodeY0 = _fogMinY - 1;
++            var nodeCountX = _fogMaxX - _fogMinX + 3;
++            var nodeCountY = _fogMaxY - _fogMinY + 3;
++
+             // Destination rectangle.
+-            var desX = (int)_origin.X - Values.FieldWidth;
+-            var desY = (int)_origin.Y - Values.FieldHeight;
+-            var desW = (_gridWidth + 2) * Values.FieldWidth;
+-            var desH = (_gridHeight + 2) * Values.FieldHeight;
++            var desX = (int)_origin.X + nodeX0 * Values.FieldWidth;
++            var desY = (int)_origin.Y + nodeY0 * Values.FieldHeight;
++            var desW = nodeCountX * Values.FieldWidth;
++            var desH = nodeCountY * Values.FieldHeight;
+             var destination = new Rectangle(desX, desY, desW, desH);
+ 
+             // Source rectangle.
+-            var sourceX = -SubDivX;
+-            var sourceY = -SubDivY;
+-            var sourceW = (_gridWidth + 2) * SubDivX;
+-            var sourceH = (_gridHeight + 2) * SubDivY;
++            var sourceX = nodeX0 * SubDivX;
++            var sourceY = nodeY0 * SubDivY;
++            var sourceW = nodeCountX * SubDivX;
++            var sourceH = nodeCountY * SubDivY;
+             var source = new Rectangle(sourceX, sourceY, sourceW, sourceH);
+ 
+             // Draw the fog. Opacity rides on the tint instead of the texture, so it can be
+@@ -382,10 +408,24 @@ namespace ProjectZ.InGame.Map
+             if (!_maskDirty)
+                 return;
+ 
++            // Recalcular la caja envolvente de la niebla en la misma pasada.
++            _fogBoxEmpty = true;
++            _fogMinX = int.MaxValue; _fogMinY = int.MaxValue;
++            _fogMaxX = int.MinValue; _fogMaxY = int.MinValue;
++
+             for (var y = 0; y < _gridHeight; y++)
+             {
+                 for (var x = 0; x < _gridWidth; x++)
+                 {
++                    if (_fog[x, y] > 0f)
++                    {
++                        if (x < _fogMinX) _fogMinX = x;
++                        if (y < _fogMinY) _fogMinY = y;
++                        if (x > _fogMaxX) _fogMaxX = x;
++                        if (y > _fogMaxY) _fogMaxY = y;
++                        _fogBoxEmpty = false;
++                    }
++
+                     // Skip every node that is sitting at the same value as last frame. During a
+                     // fade this is usually all but one or two of them.
+                     if (!_nodeDirty[x, y])
+diff --git a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/DungeonOverlay.cs b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/DungeonOverlay.cs
+index e223f81..ec387c9 100644
+--- a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/DungeonOverlay.cs
++++ b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/DungeonOverlay.cs
+@@ -10,6 +10,11 @@ namespace ProjectZ.InGame.Overlay
+     {
+         private RenderTarget2D _renderTarget;
+ 
++        // Acceso de solo lectura para el panel companion del port Switch (second screen).
++        // No cambia comportamiento: solo expone lo que ya existe.
++        public RenderTarget2D RenderTarget => _renderTarget;
++
++
+         private Animator _animationPlayer = new Animator();
+ 
+         private Rectangle _backgroundTop;
+diff --git a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/InventoryOverlay.cs b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/InventoryOverlay.cs
+index 99f91bf..6fad1bb 100644
+--- a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/InventoryOverlay.cs
++++ b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/InventoryOverlay.cs
+@@ -13,6 +13,11 @@ namespace ProjectZ.InGame.Overlay
+ 
+         private RenderTarget2D _renderTarget;
+ 
++        // Para el panel companion del port Switch, via OverlayManager. La clase es
++        // internal, asi que esto no sale del ensamblado.
++        public RenderTarget2D RenderTarget => _renderTarget;
++
++
+         private readonly Rectangle _background0 = new Rectangle(0, 0, 268, 24);
+         private readonly Rectangle _background1 = new Rectangle(0, 26, 268, 182);
+ 
+diff --git a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/MapOverlay.cs b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/MapOverlay.cs
+index fc56456..1be922f 100644
+--- a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/MapOverlay.cs
++++ b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/MapOverlay.cs
+@@ -17,6 +17,12 @@ namespace ProjectZ.InGame.Overlay
+ 
+         private RenderTarget2D _renderTarget;
+ 
++        // Acceso de solo lectura para el panel companion del port Switch (second screen):
++        // le permite reutilizar el mapa que el juego ya dibuja, en vez de redibujarlo.
++        // No cambia comportamiento: solo expone lo que ya existe.
++        public RenderTarget2D RenderTarget => _renderTarget;
++
++
+         private readonly Rectangle _recMap = new Rectangle(8, 0, 144, 144);
+         private readonly Rectangle _recHide = new Rectangle(167, 103, 9, 9);
+         private readonly Rectangle _recIcon = new Rectangle(161, 1, 30, 30);
+diff --git a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/OverlayManager.cs b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/OverlayManager.cs
+index 4aadec2..0425c11 100644
+--- a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/OverlayManager.cs
++++ b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/OverlayManager.cs
+@@ -42,8 +42,35 @@ namespace ProjectZ.InGame.Overlay
+         public AchievementOverlay AchievementOverlay;
+ 
+         private InventoryOverlay _inventoryOverlay;
++
++        // Pestana de equipo del panel companion (port Switch). Se expone el render
++        // target y un refresco, no el overlay: InventoryOverlay es internal y debe
++        // seguir siendolo.
++        public RenderTarget2D InventoryRenderTarget => _inventoryOverlay?.RenderTarget;
++
++        /// <summary>
++        /// Redibuja el render target del inventario. Core solo lo hace mientras el menu
++        /// esta abierto; el panel lo necesita en cualquier momento. DrawRT restaura
++        /// SetRenderTarget(null) el mismo, asi que no deja estado grafico sucio.
++        /// </summary>
++        public void RefreshInventoryRenderTarget(SpriteBatch spriteBatch)
++        {
++            if (_inventoryOverlay == null || spriteBatch == null) return;
++            _inventoryOverlay.UpdateRenderTarget();
++            _inventoryOverlay.DrawRT(spriteBatch);
++        }
++
+         private MapOverlay _mapOverlay;
++
++        // Acceso de solo lectura para el panel companion del port Switch (second screen).
++        // No cambia comportamiento: solo expone lo que ya existe. Ver MapOverlay.RenderTarget.
++        public MapOverlay MapOverlayRef => _mapOverlay;
++
+         private DungeonOverlay _dungeonOverlay;
++
++        // Idem para la pestana de mazmorra del panel companion.
++        public DungeonOverlay DungeonOverlayRef => _dungeonOverlay;
++
+         private PhotoOverlay _photoOverlay;
+ 
+         private Dictionary<string, GameSequence> _gameSequences = new Dictionary<string, GameSequence>();
+diff --git a/ladxhd_game_source_code/ProjectZ.Core/InGame/Pages/Settings/VideoSettingsPage.cs b/ladxhd_game_source_code/ProjectZ.Core/InGame/Pages/Settings/VideoSettingsPage.cs
+index cc2e861..b8f05f2 100644
+--- a/ladxhd_game_source_code/ProjectZ.Core/InGame/Pages/Settings/VideoSettingsPage.cs
++++ b/ladxhd_game_source_code/ProjectZ.Core/InGame/Pages/Settings/VideoSettingsPage.cs
+@@ -113,6 +113,10 @@ namespace ProjectZ.InGame.Pages
+             _contentLayout.AddElement(_toggleEpilepsySafe);
+             _tooltips.Add("tooltip_video_epilepsysafe");
+ 
++            // Filas de la plataforma (p. ej. el port de Switch: resolucion, limite de fps, Flip Grip).
++            (Game1.Instance?.Services.GetService(typeof(IPlatformVideoOptions)) as IPlatformVideoOptions)
++                ?.AddVideoOptions(_contentLayout, _tooltips, buttonWidth, buttonHeight, sliderHeight);
++
+             // Bottom Bar / Back Button:
+             _bottomBar = new InterfaceListLayout { Size = new Point(width, (int)(height * Values.MenuFooterSize)), Selectable = true, HorizontalMode = true };
+             _bottomBar.AddElement(new InterfaceButton(new Point(100, 18), new Point(2, 4), "settings_menu_back", element => { Game1.UiPageManager.PopPage(); }));
+diff --git a/ladxhd_game_source_code/ProjectZ.Core/InGame/Things/ModFile.cs b/ladxhd_game_source_code/ProjectZ.Core/InGame/Things/ModFile.cs
+index f0ad132..637afa2 100644
+--- a/ladxhd_game_source_code/ProjectZ.Core/InGame/Things/ModFile.cs
++++ b/ladxhd_game_source_code/ProjectZ.Core/InGame/Things/ModFile.cs
+@@ -49,7 +49,12 @@ namespace ProjectZ.InGame.Things
+             }
+         }
+ 
+-        private static void ApplyCachedEntries(string className, dynamic inputClass, BindingFlags flags)
++        // NOTA (port Switch): 'object' en vez de 'dynamic'. Lo unico que se hace con este
++        // parametro es inputClass.GetType() y field.SetValue(inputClass, ...), y ambas cosas
++        // funcionan igual con object. Usar 'dynamic' arrastraba Microsoft.CSharp.RuntimeBinder,
++        // que NativeAOT no puede resolver en runtime: en Switch reventaba con un Data Abort
++        // dentro del binder. Ver la nota completa en Parse().
++        private static void ApplyCachedEntries(string className, object inputClass, BindingFlags flags)
+         {
+             // If the cache is empty or the class is not in the dictionary.
+             if (_advancedCache == null || !_advancedCache.TryGetValue(className, out var entries))
+@@ -89,7 +94,21 @@ namespace ProjectZ.InGame.Things
+             }
+         }
+ 
+-        public static void Parse(string modFile, dynamic inputClass)
++        // UNICA modificacion del port Switch dentro de ProjectZ.Core: 'dynamic' -> 'object'.
++        //
++        // El parametro solo se usa para inputClass.GetType() y field.SetValue(inputClass, ...);
++        // ambas son operaciones de System.Object, asi que el comportamiento es identico en todas
++        // las plataformas. Pero declararlo 'dynamic' obliga al compilador a emitir call sites de
++        // Microsoft.CSharp.RuntimeBinder, que necesita generacion de codigo en runtime y por
++        // tanto NO funciona bajo NativeAOT: en consola real esto moria con un Data Abort
++        // (fault address 0x0) dentro de ExpressionTreeRewriter.VisitBoundLambda, con la pila
++        // Game1.Initialize -> ModFile.Parse -> DynamicInvoke -> RuntimeBinder.
++        // El build ya lo avisaba con 5 warnings IL2026 en este fichero.
++        //
++        // El spike v2.0.4 lo resolvia con un 'return' temprano bajo #if SWITCH, lo que
++        // desactivaba los mods por completo. Esto es mejor: los mods siguen funcionando.
++        // Candidato a proponer upstream (les quita los IL2026 sin cambiar semantica).
++        public static void Parse(string modFile, object inputClass)
+         {
+             // Set up flags for non-static fields. 
+             var flags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+diff --git a/ladxhd_game_source_code/ProjectZ.Core/PlatformServices.cs b/ladxhd_game_source_code/ProjectZ.Core/PlatformServices.cs
+index 1ee4242..102aef1 100644
+--- a/ladxhd_game_source_code/ProjectZ.Core/PlatformServices.cs
++++ b/ladxhd_game_source_code/ProjectZ.Core/PlatformServices.cs
+@@ -110,6 +110,18 @@ namespace ProjectZ
+         int DefaultSequenceScaleAmplify { get; }
+     }
+ 
++    /// <summary>
++    /// Filas extra de la plataforma en Ajustes -> Video (opcional). El puerto añade sus
++    /// propios elementos (InterfaceSlider / InterfaceToggle) al layout de contenido y una
++    /// clave de tooltip por elemento, en el mismo orden. Las cadenas las resuelve el
++    /// LanguageManager como las demás (la plataforma puede inyectarlas en Language.Strings).
++    /// </summary>
++    public interface IPlatformVideoOptions
++    {
++        void AddVideoOptions(InGame.Interface.InterfaceListLayout content, System.Collections.Generic.List<string> tooltips,
++                             int buttonWidth, int buttonHeight, int sliderHeight);
++    }
++
+     public interface IFileDialogService
+     {
+         bool TryOpen(string extension, string defaultPath, out string path);

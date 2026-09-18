@@ -1,0 +1,95 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Main configuration. -->
+  <PropertyGroup>
+    <AssemblyName>ProjectZ.Switch</AssemblyName>
+    <Version>2.0.6</Version>
+    <TargetFramework>net9.0</TargetFramework>
+    <TargetOS>switch</TargetOS>
+    <SwitchBuild>true</SwitchBuild>
+    <StartupObject>ProjectZ.Program</StartupObject>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>ProjectZ</RootNamespace>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>false</ImplicitUsings>
+    <TieredCompilation>false</TieredCompilation>
+    <!-- v2.0.5 deleted Directory.Build.targets and every platform constant. Nothing defines
+         SWITCH any more, so this project defines it for its own sources (SwitchCrash, SwitchDiag
+         and the gated second-screen files still guard on it). ProjectZ.Core no longer sees it. -->
+    <DefineConstants>$(DefineConstants);SWITCH</DefineConstants>
+  </PropertyGroup>
+
+  <!-- NativeAOT configuration for Switch (ARM64 via devkitpro). -->
+  <PropertyGroup>
+    <PublishAot>true</PublishAot>
+    <RuntimeIdentifier>linux-arm64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <StripSymbols>false</StripSymbols>
+    <IlcGenerateStackTraceData>true</IlcGenerateStackTraceData>
+    <!-- Disable globalization to avoid ICU/dlopen dependencies (not available on Switch). -->
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- Allow cross-OS compilation from Windows to linux-arm64. -->
+    <DisableUnsupportedError>true</DisableUnsupportedError>
+    <!-- Disable crypto/networking (not needed, avoids OpenSSL dependency). -->
+    <EventSourceSupport>false</EventSourceSupport>
+    
+    <!-- Disable heavy GC defaults so it doesn't crash mmap on Switch -->
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+    <RetainVMGarbageCollection>false</RetainVMGarbageCollection>
+  </PropertyGroup>
+
+  <!-- Exclude OpenSSL and GSS (networking/crypto) from NativeAOT link - game doesn't need them. -->
+  <ItemGroup>
+    <NativeLibrary Remove="@(NativeLibrary)" Condition="$([System.String]::Copy('%(Identity)').Contains('Security.Cryptography.Native'))" />
+    <NativeLibrary Remove="@(NativeLibrary)" Condition="$([System.String]::Copy('%(Identity)').Contains('Net.Security.Native'))" />
+  </ItemGroup>
+
+  <!-- Static linking: resolve P/Invokes at compile time for Switch (no dynamic linker). -->
+  <PropertyGroup>
+    <DirectPInvoke>SDL2;soft_oal;openal32</DirectPInvoke>
+  </PropertyGroup>
+
+  <!-- NativeAOT trimming: preserve types used via reflection by MonoGame. -->
+  <ItemGroup>
+    <RdXmlFile Include="rd.xml" />
+  </ItemGroup>
+
+  <!-- Second screen (ALEKS) fase 1: REACTIVADA (29-ago). Ya no necesita hooks propios en
+       Core salvo dos accesores de solo lectura (OverlayManager.MapOverlayRef y
+       MapOverlay.RenderTarget); el enganche de dibujo se hace heredando de Game1 en
+       SwitchGame.cs, y el ajuste vive en SwitchSettings.cs, no en GameSettings.
+       Sigue APAGADA por defecto: se activa poniendo "1" en secondscreen.txt. -->
+
+  <!-- Exclude MonoGame content pipeline build folders from the project. -->
+  <ItemGroup>
+    <Compile Remove="Content\bin\**" />
+    <Compile Remove="Content\obj\**" />
+    <EmbeddedResource Remove="Content\bin\**" />
+    <EmbeddedResource Remove="Content\obj\**" />
+  </ItemGroup>
+
+  <!-- Add the MonoGame references (DesktopGL = OpenGL via SDL2, same as Linux). -->
+  <ItemGroup>
+    <!-- Match v2.0.6, which pins 3.8.5.1 across DesktopGL/Android. ProjectZ.Core references
+         MonoGame.Framework.Native with PrivateAssets="all", so it only compiles against the
+         shared API surface: each platform project supplies its own backend, and DesktopGL
+         (OpenGL over SDL2) remains the right one for Switch. -->
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.5.1" />
+  </ItemGroup>
+
+  <!-- Include ProjectZ.Core which is the game data. -->
+  <ItemGroup>
+    <ProjectReference Include="..\ProjectZ.Core\ProjectZ.Core.csproj" />
+  </ItemGroup>
+
+  <!-- Copy the "Data" folder into the output. -->
+  <ItemGroup>
+    <None Include="..\ProjectZ.Core\Data\**\*"
+      CopyToOutputDirectory="PreserveNewest"
+      TargetPath="Data\%(RecursiveDir)%(Filename)%(Extension)"
+      ExcludeFromSingleFile="true"
+      CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

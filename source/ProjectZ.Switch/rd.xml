@@ -1,0 +1,9 @@
+<Directives xmlns="http://schemas.microsoft.com/netfx/2013/01/metadata">
+  <Application>
+    <!-- Preserve all types in game assemblies: MonoGame uses reflection for
+         content loading, type activation (ObjActivator), and effect parameters. -->
+    <Assembly Name="ProjectZ.Core" Dynamic="Required All" />
+    <Assembly Name="MonoGame.Framework" Dynamic="Required All" />
+    <Assembly Name="MonoGame.Extended" Dynamic="Required All" />
+  </Application>
+</Directives>
