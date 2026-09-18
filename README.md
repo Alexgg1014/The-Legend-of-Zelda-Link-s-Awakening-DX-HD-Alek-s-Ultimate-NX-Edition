@@ -4,7 +4,7 @@
 
 <p align="center">Nintendo Switch homebrew port of <a href="https://gitlab.com/bighead.0/ladxhd_updated">bighead's <i>ladxhd_updated</i></a> (v2.0.8) — 60 fps in handheld, Flip Grip portrait mode with a touch companion panel, in-game Switch settings.</p>
 
-<p align="center"><a href="#english">English</a> · <a href="#español">Español</a></p>
+<p align="center"><a href="#english">English</a> · <a href="#español">Español</a> · <a href="https://gbatemp.net/threads/release-zelda-links-awakening-dx-hd-aleks-ultimate-nx-edition-switch-homebrew-60fps-flip-grip-touch-second-screen.684512/">GBAtemp thread</a> · <a href="https://github.com/Alexgg1014/The-Legend-of-Zelda-Link-s-Awakening-DX-HD-Alek-s-Ultimate-NX-Edition/releases">Releases</a></p>
 
 ---
 
