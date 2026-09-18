@@ -84,7 +84,8 @@ This port was developed by Alexgg1014 **with Claude (Anthropic) as a coding assi
 ### Credits
 
 - **bighead** — [ladxhd_updated](https://gitlab.com/bighead.0/ladxhd_updated), the HD remake this port is built on, and its patcher.
-- **Alexgg1014** — Switch port, Flip Grip mode, companion panel.
+- **delsonazevedo** — [Zelda-LA-DX-HD-Updated](https://github.com/delsonazevedo/Zelda-LA-DX-HD-Updated), the **first Switch port** of LADXHD (v1.7.x, NativeAOT + libnx). This edition started from that work; the shims and the build pipeline descend from it.
+- **Alexgg1014** — this edition: v2.0.x rebase, 60 fps, Flip Grip mode, companion panel, Switch settings.
 - **MonoGame**, **devkitPro / libnx**, **SDL2**, **Mesa** — the stack that makes .NET run on a Switch.
 - The Alek's Ultimate editions of *The Minish Cap* and *A Link to the Past* — donors of the second-screen design.
 - Nintendo — *The Legend of Zelda: Link's Awakening DX*. This project is not affiliated with or endorsed by Nintendo.
@@ -154,7 +155,8 @@ Este port lo desarrolló Alexgg1014 **con Claude (Anthropic) como asistente de p
 ### Créditos
 
 - **bighead** — [ladxhd_updated](https://gitlab.com/bighead.0/ladxhd_updated), el remake HD sobre el que va este port, y su patcher.
-- **Alexgg1014** — port a Switch, modo Flip Grip, panel companion.
+- **delsonazevedo** — [Zelda-LA-DX-HD-Updated](https://github.com/delsonazevedo/Zelda-LA-DX-HD-Updated), el **primer port a Switch** de LADXHD (v1.7.x, NativeAOT + libnx). Esta edición partió de ese trabajo; los shims y el pipeline de build descienden de ahí.
+- **Alexgg1014** — esta edición: rebase a v2.0.x, 60 fps, modo Flip Grip, panel companion, ajustes Switch.
 - **MonoGame**, **devkitPro / libnx**, **SDL2**, **Mesa**.
 - Las ediciones Alek's Ultimate de *The Minish Cap* y *A Link to the Past*, donantes del diseño de segunda pantalla.
 - Nintendo — *The Legend of Zelda: Link's Awakening DX*. Este proyecto no está afiliado ni respaldado por Nintendo.
