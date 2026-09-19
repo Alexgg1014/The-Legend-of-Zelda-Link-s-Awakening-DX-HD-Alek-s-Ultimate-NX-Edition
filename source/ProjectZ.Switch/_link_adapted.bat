@@ -111,7 +111,7 @@ echo LINK OK!
 
 echo.
 echo Converting to NRO...
-%DEVKITPRO%\tools\bin\nacptool.exe --create "Alek's Ultimate Zelda LA DX HD" "Alexgg1014" "1.0.0" %PROJECT%\bin\SwitchRelease\game.nacp
+%DEVKITPRO%\tools\bin\nacptool.exe --create "Alek's Ultimate Zelda LA DX HD" "Alexgg1014" "1.1.0" %PROJECT%\bin\SwitchRelease\game.nacp
 SET "ICON_FLAG="
 if exist %PROJECT%\Icon.jpg SET "ICON_FLAG=--icon=%PROJECT%\Icon.jpg"
 %DEVKITPRO%\tools\bin\elf2nro.exe %PROJECT%\bin\SwitchRelease\ProjectZ.Switch.elf %PROJECT%\bin\SwitchRelease\ProjectZ.Switch.nro --nacp=%PROJECT%\bin\SwitchRelease\game.nacp %ICON_FLAG%

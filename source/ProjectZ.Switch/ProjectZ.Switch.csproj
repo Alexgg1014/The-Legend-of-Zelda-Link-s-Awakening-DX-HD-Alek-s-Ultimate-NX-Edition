@@ -78,6 +78,14 @@
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.5.1" />
   </ItemGroup>
 
+  <!-- Instalador in-game (v1.1): parches VCDIFF de bighead (patches_android_gl + patches_allplatforms
+       del patcher v2.0.8, con su permiso explicito) + extras, embebidos en el NRO. Se regenera con
+       _switchbuild/tools/assets_bundle.py bundle. AssetInstaller.ExpectedAssetVersion debe coincidir
+       con version.txt del ZIP (se comprueba en tiempo de ejecucion). -->
+  <ItemGroup>
+    <EmbeddedResource Include="switch-assets.zip" LogicalName="switch-assets.zip" />
+  </ItemGroup>
+
   <!-- Include ProjectZ.Core which is the game data. -->
   <ItemGroup>
     <ProjectReference Include="..\ProjectZ.Core\ProjectZ.Core.csproj" />

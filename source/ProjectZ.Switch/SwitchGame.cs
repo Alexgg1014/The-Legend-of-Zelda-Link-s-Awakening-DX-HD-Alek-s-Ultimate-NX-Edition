@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ProjectZ.InGame.Things;
+using ProjectZ.Switch.Install;
 
 namespace ProjectZ
 {
@@ -23,6 +24,81 @@ namespace ProjectZ
         public SwitchGame(bool editorMode, bool loadSave, int loadSlot)
             : base(editorMode, loadSave, loadSlot)
         {
+        }
+
+        // ------------------------------------------------------------ instalador in-game (v1.1)
+        //
+        // Si faltan Content/ y Data/ (o el marcador assets-version.txt dice otra versión), no se
+        // inicializa Game1: cargaría contenido que no existe. En su lugar AssetInstaller genera
+        // los assets desde original/ en un hilo aparte mientras SwitchInstallScreen dibuja el
+        // progreso; al terminar se llama a base.Initialize() desde Update y el juego arranca
+        // como siempre. Si falla, se muestra el motivo y + sale al menú homebrew.
+        private AssetInstaller _installer;
+        private bool _installMode;
+        private bool _installExitArmed;
+
+        private static System.IO.Stream OpenAssetBundle()
+        {
+            return typeof(SwitchGame).Assembly.GetManifestResourceStream(AssetInstaller.BundleResourceName);
+        }
+
+        protected override void Initialize()
+        {
+            var installer = new AssetInstaller(System.AppContext.BaseDirectory, OpenAssetBundle,
+                line => SwitchDiag.Log("install.log", line));
+            var action = installer.Decide();
+            SwitchDiag.Log("install.log", "boot: " + action + " (marcador=" + (installer.ReadMarker() ?? "ninguno") + ")");
+
+            if (action == AssetInstaller.BootAction.RunGame)
+            {
+                base.Initialize();
+                return;
+            }
+
+            SwitchCrash.SetSubsystem("Installer");
+            _installer = installer;
+            _installMode = true;
+
+            // Mismo backbuffer que fijará Game1.Initialize más tarde, para dibujar a pantalla completa.
+            if (Services.GetService(typeof(IPlatformDisplayConfiguration)) is IPlatformDisplayConfiguration display
+                && display.PreferredBackBufferWidth > 0 && display.PreferredBackBufferHeight > 0)
+            {
+                Graphics.PreferredBackBufferWidth = display.PreferredBackBufferWidth;
+                Graphics.PreferredBackBufferHeight = display.PreferredBackBufferHeight;
+                Graphics.ApplyChanges();
+            }
+            SwitchInstallScreen.Init(GraphicsDevice);
+            _installer.Start();
+        }
+
+        /// <summary>Update mientras se instala. Devuelve true si hay que saltarse el del juego.</summary>
+        private bool UpdateInstaller()
+        {
+            if (!_installMode)
+                return false;
+
+            if (_installer.Succeeded)
+            {
+                // Los assets ya están: arrancar el juego de verdad (Initialize + LoadContent de
+                // Game1, síncrono; la última imagen del instalador se queda mientras carga).
+                _installMode = false;
+                SwitchDiag.Log("install.log", "assets listos, inicializando el juego");
+                SwitchCrash.SetSubsystem("Startup");
+                base.Initialize();
+                return true;
+            }
+
+            if (_installer.CurrentStage == AssetInstaller.Stage.Failed)
+            {
+                var pad = GamePad.GetState(PlayerIndex.One);
+                var exitDown = pad.Buttons.Start == ButtonState.Pressed || pad.Buttons.Back == ButtonState.Pressed;
+                // Exigir soltar y volver a pulsar: que no salga por un botón que ya estaba pulsado.
+                if (!exitDown)
+                    _installExitArmed = true;
+                else if (_installExitArmed)
+                    Exit();
+            }
+            return true;
         }
 
         // Combos (17-sep-2026, solo quedan dos):
@@ -50,6 +126,9 @@ namespace ProjectZ
 
         protected override void Update(GameTime gameTime)
         {
+            if (UpdateInstaller())
+                return;
+
             base.Update(gameTime);
 
             if (!_gameScaleApplied)
@@ -754,6 +833,12 @@ namespace ProjectZ
 
         protected override void Draw(GameTime gameTime)
         {
+            if (_installMode)
+            {
+                SwitchInstallScreen.Draw(GraphicsDevice, _installer);
+                return;
+            }
+
             SwitchFpsCounter.CountFrame();
             RefreshCompanionMap();
 

@@ -2,7 +2,7 @@
 
 <h1 align="center">The Legend of Zelda: Link's Awakening DX HD — Alek's Ultimate NX Edition</h1>
 
-<p align="center">Nintendo Switch homebrew port of <a href="https://gitlab.com/bighead.0/ladxhd_updated">bighead's <i>ladxhd_updated</i></a> (v2.0.8) — 60 fps in handheld, Flip Grip portrait mode with a touch companion panel, in-game Switch settings.</p>
+<p align="center">Nintendo Switch homebrew port of <a href="https://gitlab.com/bighead.0/ladxhd_updated">bighead's <i>ladxhd_updated</i></a> (v2.0.8) — 60 fps in handheld, Flip Grip portrait mode with a touch companion panel, in-game Switch settings. Since v1.1 it installs itself on the console from your v1.0.0 copy: no PC, no patcher.</p>
 
 <p align="center"><a href="#english">English</a> · <a href="#español">Español</a> · <a href="https://gbatemp.net/threads/release-zelda-links-awakening-dx-hd-aleks-ultimate-nx-edition-switch-homebrew-60fps-flip-grip-touch-second-screen.684512/">GBAtemp thread</a> · <a href="https://github.com/Alexgg1014/The-Legend-of-Zelda-Link-s-Awakening-DX-HD-Alek-s-Ultimate-NX-Edition/releases">Releases</a></p>
 
@@ -38,17 +38,21 @@
 ### Requirements
 
 - Nintendo Switch with **Atmosphère** (tested on a v1 Switch, handheld). Launch from **hbmenu via title override** (hold R on a game), *not* from the Album — the Album applet doesn't have enough memory.
-- Your own **Link's Awakening DX HD v1.0.0** (PC) and bighead's **LADXHD Patcher v2.0.8** from the [releases page](https://gitlab.com/bighead.0/ladxhd_updated/-/releases).
-- Windows PC for the one-time asset patching step.
+- Your own **Link's Awakening DX HD v1.0.0** (the PC release: the `Content` and `Data` folders). No PC or patcher needed since v1.1: the NRO patches it on the console.
 
-### Install
+### Install (v1.1+: in-game installer)
 
-1. **Generate the assets** (once): run `LADXHD-Patcher.exe` on your v1.0.0 copy with **Platform: Windows** and **Target: OpenGL** → **Patch**. It produces the `Content` and `Data` folders for v2.0.8.
-2. On the SD card create `sdmc:/switch/zelda-ladxhd/` and copy into it:
+<p align="center"><img src="docs/installer.png" width="640" alt="In-game installer: patching your v1.0.0 copy on the console"></p>
+
+1. On the SD card create `sdmc:/switch/zelda-ladxhd/` and copy into it:
    - `ProjectZ.Switch.nro` (from this repo's release)
-   - the patched `Content/` folder
-   - the patched `Data/` folder (you can leave out `Data/Backup`)
-3. Launch from hbmenu. The first start takes a bit longer while the game loads its assets.
+   - a folder named `original/` with your **untouched v1.0.0** `Content/` and `Data/` folders inside (copying the whole game folder into `original/` also works)
+2. Launch from hbmenu. The first start shows an install screen: the NRO checks that `original/` really is v1.0.0, applies bighead's v2.0.8 patches on the console (about a minute) and creates `Content/` and `Data/` next to the NRO. Then the game starts.
+3. Keep `original/`: future updates re-patch from it. If you'd rather save space, you can delete it after installing and copy it back when a new version comes out.
+
+If you already installed v1.0.0 the old way (patcher on PC + copying `Content`/`Data`), nothing changes: the NRO sees the folders and starts the game as before.
+
+The installer only accepts a clean v1.0.0 copy. If it says *"original/ is not Link's Awakening DX HD v1.0.0"*, you copied an already-patched folder — use the original release files.
 
 Your settings live in `sdmc:/switch/zelda-ladxhd/switchsettings.txt` (plain text) and saves in `SaveFiles/`.
 
@@ -71,7 +75,7 @@ Everything else is the game's own controls.
 
 ### Updating
 
-Each release ships the NRO **paired with the upstream version it was built for**. When bighead releases a new version, this port gets rebased and re-released; the release notes say which patcher version to use. Don't mix a newer NRO with older `Content`/`Data` (or vice versa).
+Each release ships the NRO **with the patches of the upstream version it was built for embedded** (with bighead's permission). When bighead releases a new version, this port gets rebased and re-released. To update, just replace `ProjectZ.Switch.nro`: if the new NRO needs newer assets, it regenerates `Content`/`Data` from `original/` on the next start (that's why it's worth keeping `original/`). Manual installs (patcher on PC) keep working as before: use the patcher version named in the release notes.
 
 ### Building
 
@@ -83,7 +87,7 @@ This port was developed by Alexgg1014 **with Claude (Anthropic) as a coding assi
 
 ### Credits
 
-- **bighead** — [ladxhd_updated](https://gitlab.com/bighead.0/ladxhd_updated), the HD remake this port is built on, and its patcher.
+- **bighead** — [ladxhd_updated](https://gitlab.com/bighead.0/ladxhd_updated), the HD remake this port is built on, and its patcher. The VCDIFF patches embedded in the NRO (v1.1+) are bighead's, included with explicit permission; the in-game installer reimplements the patcher's logic (`AssetTargets.cs` is copied verbatim from upstream).
 - **delsonazevedo** — [Zelda-LA-DX-HD-Updated](https://github.com/delsonazevedo/Zelda-LA-DX-HD-Updated), the **first Switch port** of LADXHD (v1.7.x, NativeAOT + libnx). This edition started from that work; the shims and the build pipeline descend from it.
 - **Alexgg1014** — this edition: v2.0.x rebase, 60 fps, Flip Grip mode, companion panel, Switch settings.
 - **MonoGame**, **devkitPro / libnx**, **SDL2**, **Mesa** — the stack that makes .NET run on a Switch.
@@ -113,17 +117,21 @@ This port was developed by Alexgg1014 **with Claude (Anthropic) as a coding assi
 ### Requisitos
 
 - Switch con **Atmosphère** (probado en Switch v1, portátil). Lanzar desde **hbmenu con title override** (mantener R al abrir un juego), *no* desde el Álbum: al applet del Álbum no le alcanza la memoria.
-- Tu **Link's Awakening DX HD v1.0.0** (PC) y el **LADXHD Patcher v2.0.8** de bighead ([releases](https://gitlab.com/bighead.0/ladxhd_updated/-/releases)).
-- Un PC con Windows para el paso único de generar los assets.
+- Tu **Link's Awakening DX HD v1.0.0** (la versión de PC: las carpetas `Content` y `Data`). Desde v1.1 no hace falta PC ni patcher: el NRO lo parchea en la consola.
 
-### Instalación
+### Instalación (v1.1+: instalador in-game)
 
-1. **Genera los assets** (una vez): ejecuta `LADXHD-Patcher.exe` sobre tu copia v1.0.0 con **Platform: Windows** y **Target: OpenGL** → **Patch**. Genera las carpetas `Content` y `Data` de v2.0.8.
-2. En la SD crea `sdmc:/switch/zelda-ladxhd/` y copia dentro:
+<p align="center"><img src="docs/installer.png" width="640" alt="Instalador in-game: parcheando tu copia v1.0.0 en la consola"></p>
+
+1. En la SD crea `sdmc:/switch/zelda-ladxhd/` y copia dentro:
    - `ProjectZ.Switch.nro` (de la release de este repo)
-   - la carpeta `Content/` parcheada
-   - la carpeta `Data/` parcheada (puedes omitir `Data/Backup`)
-3. Lanza desde hbmenu. El primer arranque tarda un poco más mientras carga los assets.
+   - una carpeta `original/` con las carpetas `Content/` y `Data/` de tu **v1.0.0 sin tocar** (también vale copiar la carpeta del juego entera dentro de `original/`)
+2. Lanza desde hbmenu. El primer arranque muestra una pantalla de instalación: el NRO comprueba que `original/` es de verdad v1.0.0, aplica en la consola los parches v2.0.8 de bighead (cosa de un minuto) y crea `Content/` y `Data/` junto al NRO. Después arranca el juego.
+3. Conserva `original/`: las actualizaciones futuras vuelven a parchear desde ahí. Si prefieres ahorrar espacio, puedes borrarla tras instalar y volver a copiarla cuando salga versión nueva.
+
+Si ya instalaste v1.0.0 a la antigua (patcher en PC + copiar `Content`/`Data`), no cambia nada: el NRO ve las carpetas y arranca el juego como siempre.
+
+El instalador solo acepta una copia limpia de v1.0.0. Si dice *"original/ no es Link's Awakening DX HD v1.0.0"*, has copiado una carpeta ya parcheada: usa los ficheros de la release original.
 
 Tus ajustes están en `sdmc:/switch/zelda-ladxhd/switchsettings.txt` (texto plano) y las partidas en `SaveFiles/`.
 
@@ -146,7 +154,7 @@ Lo demás son los controles del juego.
 
 ### Actualizaciones
 
-Cada release lleva el NRO **emparejado con la versión de upstream para la que se compiló**. Cuando bighead publique versión nueva, el port se rebasa y se vuelve a publicar; las notas de la release dicen qué versión del patcher usar. No mezcles un NRO nuevo con `Content`/`Data` viejos (ni al revés).
+Cada release lleva el NRO **con los parches de la versión de upstream para la que se compiló embebidos** (con permiso de bighead). Cuando bighead publique versión nueva, el port se rebasa y se vuelve a publicar. Para actualizar basta con sustituir `ProjectZ.Switch.nro`: si el NRO nuevo necesita assets más nuevos, regenera `Content`/`Data` desde `original/` en el siguiente arranque (por eso conviene conservar `original/`). Las instalaciones manuales (patcher en PC) siguen funcionando igual: usa la versión del patcher que digan las notas de la release.
 
 ### Transparencia: hecho con IA
 
@@ -154,7 +162,7 @@ Este port lo desarrolló Alexgg1014 **con Claude (Anthropic) como asistente de p
 
 ### Créditos
 
-- **bighead** — [ladxhd_updated](https://gitlab.com/bighead.0/ladxhd_updated), el remake HD sobre el que va este port, y su patcher.
+- **bighead** — [ladxhd_updated](https://gitlab.com/bighead.0/ladxhd_updated), el remake HD sobre el que va este port, y su patcher. Los parches VCDIFF embebidos en el NRO (v1.1+) son de bighead, incluidos con su permiso explícito; el instalador in-game reimplementa la lógica del patcher (`AssetTargets.cs` es copia literal de upstream).
 - **delsonazevedo** — [Zelda-LA-DX-HD-Updated](https://github.com/delsonazevedo/Zelda-LA-DX-HD-Updated), el **primer port a Switch** de LADXHD (v1.7.x, NativeAOT + libnx). Esta edición partió de ese trabajo; los shims y el pipeline de build descienden de ahí.
 - **Alexgg1014** — esta edición: rebase a v2.0.x, 60 fps, modo Flip Grip, panel companion, ajustes Switch.
 - **MonoGame**, **devkitPro / libnx**, **SDL2**, **Mesa**.
