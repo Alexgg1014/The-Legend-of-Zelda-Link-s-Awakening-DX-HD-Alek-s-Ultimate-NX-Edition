@@ -87,7 +87,7 @@ This port was developed by Alexgg1014 **with Claude (Anthropic) as a coding assi
 
 ### Credits
 
-- **bighead** — [ladxhd_updated](https://gitlab.com/bighead.0/ladxhd_updated), the HD remake this port is built on, and its patcher. The VCDIFF patches embedded in the NRO (v1.1+) are bighead's, included with explicit permission; the in-game installer reimplements the patcher's logic (`AssetTargets.cs` is copied verbatim from upstream).
+- **bighead** — [ladxhd_updated](https://gitlab.com/bighead.0/ladxhd_updated), the HD remake this port is built on, and its patcher. The VCDIFF patches embedded in the NRO (v1.1+) are bighead's, included with explicit permission; the in-game installer reimplements the patcher's logic and reads his `file_targets_xnb.txt` for the derived-file map.
 - **delsonazevedo** — [Zelda-LA-DX-HD-Updated](https://github.com/delsonazevedo/Zelda-LA-DX-HD-Updated), the **first Switch port** of LADXHD (v1.7.x, NativeAOT + libnx). This edition started from that work; the shims and the build pipeline descend from it.
 - **Alexgg1014** — this edition: v2.0.x rebase, 60 fps, Flip Grip mode, companion panel, Switch settings.
 - **MonoGame**, **devkitPro / libnx**, **SDL2**, **Mesa** — the stack that makes .NET run on a Switch.
@@ -162,7 +162,7 @@ Este port lo desarrolló Alexgg1014 **con Claude (Anthropic) como asistente de p
 
 ### Créditos
 
-- **bighead** — [ladxhd_updated](https://gitlab.com/bighead.0/ladxhd_updated), el remake HD sobre el que va este port, y su patcher. Los parches VCDIFF embebidos en el NRO (v1.1+) son de bighead, incluidos con su permiso explícito; el instalador in-game reimplementa la lógica del patcher (`AssetTargets.cs` es copia literal de upstream).
+- **bighead** — [ladxhd_updated](https://gitlab.com/bighead.0/ladxhd_updated), el remake HD sobre el que va este port, y su patcher. Los parches VCDIFF embebidos en el NRO (v1.1+) son de bighead, incluidos con su permiso explícito; el instalador in-game reimplementa la lógica del patcher y lee su `file_targets_xnb.txt` para el mapa de ficheros derivados.
 - **delsonazevedo** — [Zelda-LA-DX-HD-Updated](https://github.com/delsonazevedo/Zelda-LA-DX-HD-Updated), el **primer port a Switch** de LADXHD (v1.7.x, NativeAOT + libnx). Esta edición partió de ese trabajo; los shims y el pipeline de build descienden de ahí.
 - **Alexgg1014** — esta edición: rebase a v2.0.x, 60 fps, modo Flip Grip, panel companion, ajustes Switch.
 - **MonoGame**, **devkitPro / libnx**, **SDL2**, **Mesa**.

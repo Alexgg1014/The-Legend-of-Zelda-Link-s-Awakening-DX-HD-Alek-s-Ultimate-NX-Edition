@@ -4,7 +4,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Threading;
-using ProjectZ.Shared;
 
 namespace ProjectZ.Switch.Install
 {
@@ -21,8 +20,9 @@ namespace ProjectZ.Switch.Install
     /// HandleMultiFilePatches + CopyNewFiles + CleanUp) reducida a lo que necesita Switch:
     ///   1. Cada fichero de original/Content y original/Data con parche de su nombre se
     ///      parchea; sin parche, se copia tal cual.
-    ///   2. Cada "master" de <see cref="AssetTargets"/> genera además sus derivados
-    ///      (p. ej. eng.lng → esp.lng, deu.lng…) aplicando <c>&lt;derivado&gt;.vcdiff</c>.
+    ///   2. Cada "master" de <c>file_targets_xnb.txt</c> (tabla de bighead, va en el ZIP; se
+    ///      parsea, no se copia a código: él la mantiene al día con los parches) genera además
+    ///      sus derivados (p. ej. eng.lng → esp.lng, deu.lng…) aplicando <c>&lt;derivado&gt;.vcdiff</c>.
     ///   3. Los ficheros con nombre de derivado que hubiera en original/ se ignoran.
     ///   4. dungeon3_1.map(.data) se toman del recurso del patcher, no de original/.
     ///   5. Extras del patcher: Data/Achievements/*. Limpieza de mapas basura.
@@ -302,8 +302,8 @@ namespace ProjectZ.Switch.Install
 
         private void Patch(Bundle bundle, List<SourceFile> files)
         {
-            var targets = AssetTargets.Get(true);
-            var derived = AssetTargets.GetTargetNames(true);
+            var targets = bundle.Targets;
+            var derived = bundle.DerivedNames;
 
             Directory.CreateDirectory(ContentDir);
             Directory.CreateDirectory(DataDir);
@@ -476,6 +476,10 @@ namespace ProjectZ.Switch.Install
             public readonly Dictionary<string, byte[]> Extras = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
             /// <summary>nombre → bytes que sustituyen al fichero de original/ como fuente (dungeon3_1.map).</summary>
             public readonly Dictionary<string, byte[]> Overrides = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
+            /// <summary>master → derivados, de file_targets_xnb.txt (equivale a AssetTargets.Get(useXnb: true) del patcher).</summary>
+            public readonly Dictionary<string, string[]> Targets = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
+            /// <summary>Todos los nombres derivados (AssetTargets.GetTargetNames).</summary>
+            public readonly HashSet<string> DerivedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             public static Bundle Load(Func<Stream> open, Action<string> log)
             {
@@ -499,6 +503,8 @@ namespace ProjectZ.Switch.Install
                             b.Version = Encoding.UTF8.GetString(bytes).Trim();
                         else if (full == "manifest.txt")
                             b.ParseManifest(Encoding.UTF8.GetString(bytes));
+                        else if (full == "file_targets_xnb.txt")
+                            b.ParseTargets(Encoding.UTF8.GetString(bytes));
                         else if (full.StartsWith("patches/") && full.EndsWith(".vcdiff"))
                             b.Patches[e.Name.Substring(0, e.Name.Length - ".vcdiff".Length)] = bytes;
                         else if (full.StartsWith("extra/"))
@@ -519,7 +525,29 @@ namespace ProjectZ.Switch.Install
                             " entradas de manifiesto, " + b.Extras.Count + " extras");
                 if (b.Patches.Count == 0)
                     throw new InstallException("El paquete de parches está vacío", null);
+                if (b.Targets.Count == 0)
+                    throw new InstallException("El paquete no trae file_targets_xnb.txt", null);
                 return b;
+            }
+
+            // Formato (bighead, ladxhd_patcher_source_code/Resources/file_targets_xnb.txt):
+            //   # comentarios
+            //   <fuente><TAB><derivado> <derivado> ...
+            // Fuente = fichero presente en v1.0.0; cada derivado se crea aplicando <derivado>.vcdiff.
+            private void ParseTargets(string text)
+            {
+                foreach (var raw in text.Split('\n'))
+                {
+                    var line = raw.TrimEnd('\r');
+                    if (line.Length == 0 || line[0] == '#') continue;
+                    int tab = line.IndexOf('\t');
+                    if (tab <= 0) continue;
+                    string master = line.Substring(0, tab);
+                    var names = line.Substring(tab + 1).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (names.Length == 0) continue;
+                    Targets[master] = names;
+                    foreach (var n in names) DerivedNames.Add(n);
+                }
             }
 
             private static byte[] ReadEntry(ZipArchiveEntry e)
