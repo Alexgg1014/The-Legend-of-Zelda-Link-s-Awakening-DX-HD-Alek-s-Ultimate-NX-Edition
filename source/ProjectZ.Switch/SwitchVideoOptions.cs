@@ -39,6 +39,8 @@ namespace ProjectZ
             d["tooltip_switch_flip"]      = SwitchStrings.Get("tip_flip");
             d["tooltip_switch_hidehud"]   = SwitchStrings.Get("tip_hidehud");
             d["tooltip_switch_uilarge"]   = SwitchStrings.Get("tip_uilarge");
+            d["switch_video_overlay"]     = SwitchStrings.Get("video_overlay");
+            d["tooltip_switch_overlay"]   = SwitchStrings.Get("tip_overlay");
         }
 
         public void AddVideoOptions(InterfaceListLayout content, List<string> tooltips,
@@ -82,6 +84,15 @@ namespace ProjectZ
                 "switch_video_uilarge", SwitchSettings.UiLarge != 0,
                 state => { SwitchSettings.UiLarge = state ? 1 : 0; SwitchSettings.Save(); }));
             tooltips.Add("tooltip_switch_uilarge");
+
+            // Panel con Minus en apaisado. Vive aqui y no en la pestana AJUSTES del panel
+            // porque esa ya tiene sus 10 filas justas y, sobre todo, porque si alguien lo
+            // apaga sin querer desde el propio overlay se queda sin forma de volver a abrirlo.
+            content.AddElement(InterfaceToggle.GetToggleButton(
+                new Point(buttonWidth, buttonHeight), new Point(5, 2),
+                "switch_video_overlay", SwitchSettings.PanelOverlay != 0,
+                state => { SwitchSettings.PanelOverlay = state ? 1 : 0; SwitchSettings.Save(); }));
+            tooltips.Add("tooltip_switch_overlay");
         }
 
         private static int FpsIndex(int limit) => limit == 30 ? 1 : limit == 45 ? 2 : limit == 60 ? 3 : 0;

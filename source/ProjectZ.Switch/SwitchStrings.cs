@@ -39,6 +39,10 @@ namespace ProjectZ.InGame.Things
                 ["upd_available"] = "v{0} - TAP TO INSTALL", ["upd_verifying"] = "VERIFYING",
                 ["upd_installing"] = "INSTALLING", ["upd_restart"] = "DONE - RESTART THE GAME",
                 ["upd_failed"] = "FAILED - TAP TO RETRY",
+                // Overlay del panel en apaisado (v1.2).
+                ["overlay_hint"] = "D-PAD MOVE   A/B USE   L/R TABS   MINUS CLOSE",
+                ["video_overlay"] = "Panel with Minus (landscape)",
+                ["tip_overlay"] = "Minus opens the companion panel over the game, which pauses while it is up.",
             },
             ["esp"] = new Dictionary<string, string>
             {
@@ -65,6 +69,9 @@ namespace ProjectZ.InGame.Things
                 ["upd_available"] = "v{0} - TOCA PARA INSTALAR", ["upd_verifying"] = "VERIFICANDO",
                 ["upd_installing"] = "INSTALANDO", ["upd_restart"] = "LISTO - REINICIA EL JUEGO",
                 ["upd_failed"] = "FALLO - TOCA PARA REINTENTAR",
+                ["overlay_hint"] = "CRUCETA MOVER   A/B USAR   L/R PESTANAS   MINUS CERRAR",
+                ["video_overlay"] = "Panel con Minus (apaisado)",
+                ["tip_overlay"] = "Minus abre el panel companion sobre el juego, que se pausa mientras este abierto.",
             },
             ["por"] = new Dictionary<string, string>
             {
@@ -91,6 +98,9 @@ namespace ProjectZ.InGame.Things
                 ["upd_available"] = "v{0} - TOQUE PARA INSTALAR", ["upd_verifying"] = "CONFERINDO",
                 ["upd_installing"] = "INSTALANDO", ["upd_restart"] = "PRONTO - REINICIE O JOGO",
                 ["upd_failed"] = "FALHOU - TOQUE PARA TENTAR DE NOVO",
+                ["overlay_hint"] = "DIRECIONAL MOVER   A/B USAR   L/R ABAS   MINUS FECHAR",
+                ["video_overlay"] = "Painel com Minus (horizontal)",
+                ["tip_overlay"] = "Minus abre o painel companion sobre o jogo, que pausa enquanto estiver aberto.",
             },
             ["fre"] = new Dictionary<string, string>
             {
@@ -117,6 +127,9 @@ namespace ProjectZ.InGame.Things
                 ["upd_available"] = "v{0} - TOUCHEZ POUR INSTALLER", ["upd_verifying"] = "VERIFICATION",
                 ["upd_installing"] = "INSTALLATION", ["upd_restart"] = "FINI - RELANCEZ LE JEU",
                 ["upd_failed"] = "ECHEC - TOUCHEZ POUR REESSAYER",
+                ["overlay_hint"] = "CROIX DEPLACER   A/B UTILISER   L/R ONGLETS   MINUS FERMER",
+                ["video_overlay"] = "Panneau avec Minus (paysage)",
+                ["tip_overlay"] = "Minus ouvre le panneau companion sur le jeu, qui se met en pause pendant ce temps.",
             },
             ["deu"] = new Dictionary<string, string>
             {
@@ -143,6 +156,9 @@ namespace ProjectZ.InGame.Things
                 ["upd_available"] = "v{0} - TIPPEN ZUM INSTALLIEREN", ["upd_verifying"] = "PRUEFE DATEI",
                 ["upd_installing"] = "INSTALLIERE", ["upd_restart"] = "FERTIG - SPIEL NEU STARTEN",
                 ["upd_failed"] = "FEHLER - TIPPEN ZUM WIEDERHOLEN",
+                ["overlay_hint"] = "STEUERKREUZ BEWEGEN   A/B NUTZEN   L/R TABS   MINUS SCHLIESSEN",
+                ["video_overlay"] = "Panel mit Minus (Querformat)",
+                ["tip_overlay"] = "Minus oeffnet das Companion-Panel ueber dem Spiel, das solange pausiert.",
             },
             ["ita"] = new Dictionary<string, string>
             {
@@ -169,6 +185,9 @@ namespace ProjectZ.InGame.Things
                 ["upd_available"] = "v{0} - TOCCA PER INSTALLARE", ["upd_verifying"] = "VERIFICA",
                 ["upd_installing"] = "INSTALLAZIONE", ["upd_restart"] = "FATTO - RIAVVIA IL GIOCO",
                 ["upd_failed"] = "ERRORE - TOCCA PER RIPROVARE",
+                ["overlay_hint"] = "CROCIERA MUOVI   A/B USA   L/R SCHEDE   MINUS CHIUDI",
+                ["video_overlay"] = "Pannello con Minus (orizzontale)",
+                ["tip_overlay"] = "Minus apre il pannello companion sul gioco, che resta in pausa intanto.",
             },
         };
 

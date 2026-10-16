@@ -33,6 +33,7 @@
 - **Sidebar HUD** on the panel (hearts, equipped items in the button layout, rupees, keys) so the game HUD can be hidden in Flip Grip.
 - **Switch options inside the game's own menu** — Pause → Settings → Video: resolution, fps limit, Flip Grip, hide HUD, large UI.
 - Panel **and** the Switch rows in the game's own Video menu translated to **English, Spanish, Portuguese, French, German and Italian** (follows the game language). The story guide is in all six too, using each language's official place, dungeon and character names from the game's own files.
+- **Companion panel in landscape too** (new in v1.2) — `Minus` opens it over the game, driven with the D-pad, `A`/`B` and `L`/`R`. Until now the panel only existed in Flip Grip and only by touch, so docked players never saw it.
 - **In-app updater** (new in v1.2) — check, download and install a new version from the companion panel, without a PC. The download is checked against a size and SHA-256 pinned in a manifest, a verified backup of your current NRO is made first, and any failure restores it. See [Updating](#updating).
 - Zero new art: everything on the panel is drawn from the game's own sprites, fonts and colors (respects your LAHDMods).
 
@@ -59,11 +60,19 @@ Your settings live in `sdmc:/switch/zelda-ladxhd/switchsettings.txt` (plain text
 
 ### Controls
 
-| Combo | Action |
+| Button | Action |
 |---|---|
+| `Minus` | **Open the companion panel over the game** (landscape only, new in v1.2) |
 | `L + R + X` | Toggle Flip Grip (portrait) ↔ normal |
 | `L + R + ←/→` | Switch companion tab without touching |
 | Touch | Tabs, settings rows, items (tap = A, drag = choose button) |
+
+**With the panel open** (landscape overlay): D-pad moves the selection, `A` uses it, `L`/`R`
+cycle the tabs and `Minus` closes. On the ITEMS tab, `A` equips to the A slot and `B` to the B
+slot. Touch keeps working too. **The game pauses while the panel is up**, so the D-pad is the
+panel's and Link stays put; that is also why the game never sees the `Minus` that opens and
+closes it (in this game `Minus` is its own map). Turn it off in Pause → Settings → Video if you
+would rather keep `Minus` for the game's map.
 
 Everything else is the game's own controls.
 
@@ -138,6 +147,7 @@ This port was developed by Alexgg1014 **with Claude (Anthropic) as a coding assi
 - **HUD en la barra lateral** del panel (corazones, objetos equipados en la forma de los botones, rupias, llaves), para poder ocultar el HUD del juego en Flip Grip.
 - **Opciones Switch dentro del menú del juego**: Pausa → Ajustes → Vídeo: resolución, límite de fps, Flip Grip, ocultar HUD, UI grande.
 - El panel **y** las filas de Switch del menú Vídeo del propio juego, traducidos a **inglés, español, portugués, francés, alemán e italiano** (siguen el idioma del juego). La guía de historia también está en los seis, con los nombres oficiales de lugares, mazmorras y personajes de cada idioma, sacados de los ficheros del propio juego.
+- **Panel companion también en apaisado** (nuevo en la v1.2) — `Minus` lo abre sobre el juego y se maneja con la cruceta, `A`/`B` y `L`/`R`. Hasta ahora el panel solo existía en Flip Grip y solo por toque, así que quien juega en dock no lo veía nunca.
 - **Updater in-app** (nuevo en la v1.2) — comprueba, descarga e instala una versión nueva desde el panel companion, sin pasar por el PC. La descarga se comprueba contra el tamaño y el SHA-256 fijados en un manifiesto, antes se hace una copia de seguridad verificada de tu NRO actual, y cualquier fallo la restaura. Ver [Actualizaciones](#actualizaciones).
 - Cero arte nuevo: todo el panel se dibuja con los sprites, fuentes y colores del propio juego (respeta tus LAHDMods).
 
@@ -164,11 +174,19 @@ Tus ajustes están en `sdmc:/switch/zelda-ladxhd/switchsettings.txt` (texto plan
 
 ### Controles
 
-| Combo | Acción |
+| Botón | Acción |
 |---|---|
+| `Minus` | **Abrir el panel companion sobre el juego** (solo apaisado, nuevo en la v1.2) |
 | `L + R + X` | Flip Grip (vertical) ↔ normal |
 | `L + R + ←/→` | Cambiar pestaña del panel sin tocar |
 | Toque | Pestañas, filas de ajustes, objetos (toque = A, arrastre = elegir botón) |
+
+**Con el panel abierto** (overlay de apaisado): la cruceta mueve la selección, `A` la usa, `L`/`R`
+cambian de pestaña y `Minus` cierra. En la pestaña EQUIPO, `A` equipa al slot de A y `B` al de B.
+El toque sigue funcionando igual. **El juego se pausa mientras el panel está abierto**, así que la
+cruceta es del panel y Link no se mueve; es también lo que hace que el juego no vea el `Minus` que
+abre y cierra (en este juego `Minus` abre su propio mapa). Se puede apagar en Pausa → Ajustes →
+Vídeo si prefieres dejar `Minus` para el mapa del juego.
 
 Lo demás son los controles del juego.
 

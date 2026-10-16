@@ -114,6 +114,13 @@ namespace ProjectZ.InGame.Things
         public static int HideHud = 1;
 
         /// <summary>
+        /// 1 = en apaisado, Minus abre el panel companion como overlay sobre el juego, que
+        /// queda congelado mientras tanto. Por defecto 1: es la única forma de ver el panel
+        /// en dock. A 0, Minus vuelve a hacer solo lo del juego (abrir su mapa).
+        /// </summary>
+        public static int PanelOverlay = 1;
+
+        /// <summary>
         /// 1 = el usuario aplicó "AJUSTES OPTIMIZADOS" desde el panel. Se reaplica en cada
         /// arranque DESPUÉS de que el juego cargue sus ajustes, porque varios viven en
         /// GameSettings (sombras, luces de objetos, niebla, corrección de color) y el juego
@@ -169,6 +176,7 @@ namespace ProjectZ.InGame.Things
                         else if (key == "render")        Render        = value == 720 ? 720 : 1080;
                         else if (key == "panelhudlarge") PanelHudLarge = value != 0 ? 1 : 0;
                         else if (key == "uilarge")       UiLarge       = value != 0 ? 1 : 0;
+                        else if (key == "paneloverlay")  PanelOverlay  = value != 0 ? 1 : 0;
                     }
                     return;
                 }
@@ -239,7 +247,9 @@ namespace ProjectZ.InGame.Things
                     "# panelhudlarge: 1 = HUD del panel (corazones, objetos, rupias) grande\n" +
                     "panelhudlarge=" + PanelHudLarge + "\n" +
                     "# uilarge:       1 = UI del juego (menus, dialogos) un paso mas grande a 720\n" +
-                    "uilarge=" + UiLarge + "\n");
+                    "uilarge=" + UiLarge + "\n" +
+                    "# paneloverlay:  1 = en apaisado, Minus abre el panel sobre el juego (congelado)\n" +
+                    "paneloverlay=" + PanelOverlay + "\n");
             }
             catch { }
         }

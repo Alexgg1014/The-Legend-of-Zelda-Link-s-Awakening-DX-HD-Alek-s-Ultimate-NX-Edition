@@ -378,6 +378,14 @@ namespace ProjectZ.InGame.Things
                 px = (int)(layout.LogicalW / 2.0f - (ty - outH / 2.0f) / fx);
                 py = (int)(layout.LogicalH / 2.0f + (tx - outW / 2.0f) / fy);
             }
+            else if (layout.LogicalW > 0 && layout.LogicalH > 0)
+            {
+                // Sin rotar (overlay de apaisado, v1.2): mismo problema del digitalizador, que
+                // entrega SIEMPRE 1280x720 aunque el backbuffer sea 1920x1080. Sin esta escala
+                // los toques caen a dos tercios de donde se toca.
+                px = (int)(physX * (layout.LogicalW / (float)TouchPanelW));
+                py = (int)(physY * (layout.LogicalH / (float)TouchPanelH));
+            }
 
             var c = layout.Companion;
             if (c.IsEmpty)

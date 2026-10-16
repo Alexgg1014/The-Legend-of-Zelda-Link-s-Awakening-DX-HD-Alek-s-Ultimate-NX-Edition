@@ -1,4 +1,4 @@
-# v1.2.0 — in-app updater, upstream v2.0.9, and the port's UI in six languages
+# v1.2.0 — in-app updater, the panel in landscape, upstream v2.0.9, six languages
 
 Built against **bighead's ladxhd_updated v2.0.9** (released 9 October 2026). If you are on
 v1.1.0, just replace the NRO: the first start notices the assets are from v2.0.8, re-patches
@@ -27,6 +27,24 @@ What it does *not* do matters as much as what it does:
 
 The design is the one from the *Minish Cap* edition of this project, which has shipped it since
 its v1.3 — the parts that differ are the ones that had to.
+
+### The companion panel works in landscape now
+
+Press **Minus** and the panel opens over the game, centred, with everything dimmed behind it.
+D-pad moves the selection, **A** uses it, **L**/**R** cycle the tabs, **Minus** closes. On the
+ITEMS tab, **A** equips to the A slot and **B** to the B slot. Touch keeps working as well.
+
+Until now the panel only existed in Flip Grip and only by touch, which meant that if you play
+docked — and plenty of people do — none of it was reachable: no map, no story guide, no settings
+without the combos.
+
+**The game pauses while the panel is up.** That is deliberate, and it buys two things: the D-pad
+belongs to the panel without Link wandering off, and the game never sees the `Minus` that opens
+and closes the panel — in this game `Minus` is the game's own map, so without that it would open
+underneath every time.
+
+If you would rather keep `Minus` for the map, turn the panel off under
+**Pause → Settings → Video → Panel with Minus**.
 
 ### Up to date with upstream v2.0.9
 

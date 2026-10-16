@@ -134,6 +134,16 @@ namespace ProjectZ
             if (UpdateInstaller())
                 return;
 
+            // El overlay del panel en apaisado CONGELA el juego mientras está abierto: es lo
+            // que evita que Link ande mientras navegas, y lo que hace que el juego no vea el
+            // Minus que abre y cierra (en este juego Minus abre su propio mapa). Ver
+            // SwitchOverlay para el porqué de seguir congelado hasta soltar el botón.
+            if (PollOverlay())
+            {
+                PollTouch();        // el dedo sigue valiendo sobre el overlay
+                return;
+            }
+
             base.Update(gameTime);
 
             if (!_gameScaleApplied)
@@ -378,10 +388,10 @@ namespace ProjectZ
                 // Arrastre en curso (dedo abajo): actualizar fantasma y slot bajo el dedo.
                 if (SwitchTouch.IsDown)
                 {
-                    if (AleksLayout.MapTouchPixels(_flipLayout, SwitchTouch.CurrentX, SwitchTouch.CurrentY, out var cx, out var cy, out _))
+                    if (AleksLayout.MapTouchPixels(PanelLayout, SwitchTouch.CurrentX, SwitchTouch.CurrentY, out var cx, out var cy, out _))
                     {
                         if (SecondScreen.DragIndex < 0 &&
-                            AleksLayout.MapTouchPixels(_flipLayout, SwitchTouch.StartX, SwitchTouch.StartY, out var sx0, out var sy0, out var sIn) && sIn)
+                            AleksLayout.MapTouchPixels(PanelLayout, SwitchTouch.StartX, SwitchTouch.StartY, out var sx0, out var sy0, out var sIn) && sIn)
                         {
                             // Solo arranca un arrastre desde un objeto de la bolsa o un slot del rombo,
                             // y solo tras moverse un poco (si no, es un toque).
@@ -409,7 +419,7 @@ namespace ProjectZ
                 SecondScreen.DragIndex = -1;
                 SecondScreen.DragHoverSlot = -1;
 
-                if (!AleksLayout.MapTouchPixels(_flipLayout, physX, physY, out var px, out var py, out var inside))
+                if (!AleksLayout.MapTouchPixels(PanelLayout, physX, physY, out var px, out var py, out var inside))
                     return;
 
                 if (dragging >= 0)
@@ -422,31 +432,16 @@ namespace ProjectZ
                 }
 
                 var hit = inside ? SecondScreen.HitTest(px, py) : -1;
-                var c = _flipLayout.Companion;
+                var c = PanelLayout.Companion;
                 SwitchDiag.Log("secondscreen.log",
                     "tap fisico " + physX + "," + physY +
                     " -> lienzo " + (c.X + px) + "," + (c.Y + py) +
                     " -> panel " + px + "," + py + (inside ? "" : " (fuera)") +
                     " hit=" + hit +
-                    " [out " + (_flipLayout.FlipDst.X * 2 + _flipLayout.FlipDst.W) + "x" + (_flipLayout.FlipDst.Y * 2 + _flipLayout.FlipDst.H) +
-                    " f=" + _flipLayout.FlipScaleX.ToString("0.00") + " panel@" + c.X + "," + c.Y + " " + c.W + "x" + c.H + "]");
+                    " [out " + (PanelLayout.FlipDst.X * 2 + PanelLayout.FlipDst.W) + "x" + (PanelLayout.FlipDst.Y * 2 + PanelLayout.FlipDst.H) +
+                    " f=" + PanelLayout.FlipScaleX.ToString("0.00") + " panel@" + c.X + "," + c.Y + " " + c.W + "x" + c.H + "]");
 
-                if (hit >= 0 && hit <= SecondScreenState.BarSettings)
-                    SecondScreenState.Set(SecondScreenState.TabForBarSlot(hit));
-                else if (hit >= SecondScreen.HitHandSlot)
-                {
-                    // Toque suelto en un slot del rombo: abre EQUIPO.
-                    SecondScreenState.Set(SecondScreenState.Tab.Equipment);
-                }
-                else if (hit >= SecondScreen.HitBagItem)
-                {
-                    // Toque suelto en un objeto: al botón A, como en TMC.
-                    var gm0 = GameManager;
-                    if (gm0 != null)
-                        EquipTo(hit - SecondScreen.HitBagItem, SecondScreen.EquipTargetSlot(gm0));
-                }
-                else if (hit >= SecondScreen.HitSettingsRow)
-                    ApplySettingsRow((SecondScreen.SettingsRow)(hit - SecondScreen.HitSettingsRow));
+                DispatchPanelHit(hit);
             }
             catch (System.Exception e)
             {
@@ -521,6 +516,149 @@ namespace ProjectZ
             gm.Equipment[from] = prev;
             SwitchDiag.Log("secondscreen.log", "equipo: " + (item?.Name ?? "(vacio)") + " -> slot " + toSlot +
                 (prev != null ? " (" + prev.Name + " a " + from + ")" : ""));
+        }
+
+        // Estados anteriores de los botones del overlay. Todo por flanco: mantener pulsado no
+        // repite. No hay autorrepetición a propósito — 10 filas y 8 casillas no la piden, y
+        // sin ella no hay forma de pasarse de largo sin querer.
+        private bool _ovOpenWasDown, _ovUpWasDown, _ovDownWasDown, _ovLeftWasDown, _ovRightWasDown;
+        private bool _ovAcceptWasDown, _ovCancelWasDown, _ovTabPrevWasDown, _ovTabNextWasDown;
+
+        /// <summary>
+        /// ¿Se puede abrir el overlay ahora mismo? Solo en apaisado (en FLIP el panel ya está
+        /// a la vista), con partida en curso y sin ningún menú del juego abierto, para no
+        /// montarse encima del mapa o del inventario.
+        /// </summary>
+        private bool OverlayAllowed()
+        {
+            if (SwitchSettings.PanelOverlay == 0 || SwitchSettings.Flip != 0 || _flipActive)
+                return false;
+            if (!InProgress)
+                return false;
+            var overlay = GameManager?.InGameOverlay;
+            return overlay != null && overlay.MenuIsClosed;
+        }
+
+        /// <summary>
+        /// Lee el mando para el overlay del panel. Devuelve true si este frame hay que
+        /// CONGELAR el juego (overlay abierto, o cerrado pero esperando a que se suelte Minus).
+        /// </summary>
+        private bool PollOverlay()
+        {
+            var openBtn = false;
+            var up = false; var down = false; var left = false; var right = false;
+            var accept = false; var cancel = false; var tabPrev = false; var tabNext = false;
+
+            for (var i = 0; i < 4; i++)
+            {
+                var pad = GamePad.GetState((PlayerIndex)i);
+                if (!pad.IsConnected)
+                    continue;
+                if (pad.Buttons.Back == ButtonState.Pressed) openBtn = true;
+                if (!SwitchOverlay.IsOpen)
+                    continue;
+
+                // Con el overlay abierto la cruceta y A/B/L/R son del panel: el juego está
+                // congelado, así que no hay nada con lo que chocar.
+                if (pad.DPad.Up == ButtonState.Pressed) up = true;
+                if (pad.DPad.Down == ButtonState.Pressed) down = true;
+                if (pad.DPad.Left == ButtonState.Pressed) left = true;
+                if (pad.DPad.Right == ButtonState.Pressed) right = true;
+                if (pad.Buttons.A == ButtonState.Pressed) accept = true;
+                if (pad.Buttons.B == ButtonState.Pressed) cancel = true;
+                if (pad.Buttons.LeftShoulder == ButtonState.Pressed) tabPrev = true;
+                if (pad.Buttons.RightShoulder == ButtonState.Pressed) tabNext = true;
+            }
+
+            // Minus por flanco: abre si se puede, cierra si está abierto.
+            if (openBtn && !_ovOpenWasDown)
+            {
+                if (SwitchOverlay.IsOpen)
+                    SwitchOverlay.Close();
+                else if (OverlayAllowed())
+                    SwitchOverlay.Open();
+            }
+            _ovOpenWasDown = openBtn;
+
+            if (SwitchOverlay.IsOpen)
+            {
+                // Si la partida se acaba o alguien fuerza FLIP, el overlay no tiene sentido.
+                if (!OverlayAllowed())
+                {
+                    SwitchOverlay.ForceClose();
+                    return false;
+                }
+
+                var hit = SwitchOverlay.Navigate(
+                    up && !_ovUpWasDown, down && !_ovDownWasDown,
+                    left && !_ovLeftWasDown, right && !_ovRightWasDown,
+                    accept && !_ovAcceptWasDown, cancel && !_ovCancelWasDown,
+                    tabPrev && !_ovTabPrevWasDown, tabNext && !_ovTabNextWasDown);
+
+                _ovUpWasDown = up; _ovDownWasDown = down;
+                _ovLeftWasDown = left; _ovRightWasDown = right;
+                _ovAcceptWasDown = accept; _ovCancelWasDown = cancel;
+                _ovTabPrevWasDown = tabPrev; _ovTabNextWasDown = tabNext;
+
+                DispatchPanelHit(hit);
+                return true;
+            }
+
+            // Cerrado pero con Minus aún pulsado: seguimos congelados. Si soltáramos ahora, el
+            // juego vería un flanco de pulsación nuevo (su estado anterior es de antes de
+            // abrir) y abriría su mapa justo al salir del panel.
+            if (SwitchOverlay.SwallowingClose)
+            {
+                if (openBtn)
+                    return true;
+                SwitchOverlay.SwallowingClose = false;
+                _ovUpWasDown = _ovDownWasDown = _ovLeftWasDown = _ovRightWasDown = false;
+                _ovAcceptWasDown = _ovCancelWasDown = false;
+                _ovTabPrevWasDown = _ovTabNextWasDown = false;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Ejecuta un código de HitTest del panel. Lo llaman el toque (en FLIP y en el overlay)
+        /// y el mando (en el overlay), para que las dos vías hagan EXACTAMENTE lo mismo: si
+        /// alguna vez divergen, será porque alguien añadió un caso aquí a medias.
+        ///
+        /// Ojo al orden: los códigos van de mayor a menor (400 → 300 → 200 → 100), así que
+        /// HitBagItemB tiene que comprobarse antes que HitHandSlot.
+        /// </summary>
+        private void DispatchPanelHit(int hit)
+        {
+            if (hit < 0)
+                return;
+
+            if (hit >= SecondScreen.HitBagItemB)
+            {
+                // Solo del mando (botón B en EQUIPO): al slot de B.
+                var gmB = GameManager;
+                if (gmB != null)
+                    EquipTo(hit - SecondScreen.HitBagItemB, SecondScreen.EquipTargetSlotB(gmB));
+            }
+            else if (hit >= SecondScreen.HitHandSlot)
+            {
+                // Toque suelto en un slot del rombo: abre EQUIPO.
+                SecondScreenState.Set(SecondScreenState.Tab.Equipment);
+            }
+            else if (hit >= SecondScreen.HitBagItem)
+            {
+                // Toque suelto en un objeto: al botón A, como en TMC.
+                var gm0 = GameManager;
+                if (gm0 != null)
+                    EquipTo(hit - SecondScreen.HitBagItem, SecondScreen.EquipTargetSlot(gm0));
+            }
+            else if (hit >= SecondScreen.HitSettingsRow)
+            {
+                ApplySettingsRow((SecondScreen.SettingsRow)(hit - SecondScreen.HitSettingsRow));
+            }
+            else if (hit <= SecondScreenState.BarSettings)
+            {
+                SecondScreenState.Set(SecondScreenState.TabForBarSlot(hit));
+            }
         }
 
         /// <summary>
@@ -633,6 +771,18 @@ namespace ProjectZ
         /// </summary>
         private AleksLayout.Layout _flipLayout;
         private bool _flipActive;
+
+        /// <summary>
+        /// Layout del overlay de apaisado (v1.2). Se recalcula al dibujarlo, porque depende
+        /// del tamaño del backbuffer de ese frame.
+        /// </summary>
+        private AleksLayout.Layout _overlayLayout;
+
+        /// <summary>
+        /// El layout del panel que está activo AHORA: el de FLIP, o el del overlay si está
+        /// abierto. El toque mapea contra este, así que con uno solo valen las dos vías.
+        /// </summary>
+        private AleksLayout.Layout PanelLayout => SwitchOverlay.IsOpen ? _overlayLayout : _flipLayout;
 
         /// <summary>
         /// Entra o sale del modo Flip Grip.
@@ -807,7 +957,10 @@ namespace ProjectZ
 
         private void RefreshCompanionMap()
         {
-            if (SwitchSettings.Flip == 0 || _mapRefreshFailures >= 3)
+            // En apaisado esto no corria porque no habia panel. Desde la v1.2 si lo hay
+            // mientras el overlay esta abierto, y sin esto sus pestanas MAPA y EQUIPO salen
+            // en blanco o con el render target de la ultima vez.
+            if ((SwitchSettings.Flip == 0 && !SwitchOverlay.IsOpen) || _mapRefreshFailures >= 3)
                 return;
 
             if (++_mapRefreshCounter < MapRefreshFrames)
@@ -899,8 +1052,20 @@ namespace ProjectZ
             }
             else
             {
-                // Apaisado: sin panel. El mapa se ve donde siempre, en el menu de pausa.
                 PresentScaledFrame();
+
+                // Apaisado: el panel aparece como overlay cuando el jugador lo abre con Minus.
+                if (SwitchOverlay.IsOpen)
+                {
+                    var pp = Graphics.GraphicsDevice.PresentationParameters;
+                    var w = pp.BackBufferWidth;
+                    var h = pp.BackBufferHeight;
+                    _overlayLayout = SwitchOverlay.BuildLayout(w, h);
+                    SwitchOverlay.DrawBackdrop(SpriteBatch, w, h);
+                    SecondScreen.DrawInLayout(SpriteBatch, _overlayLayout, null);
+                    SwitchOverlay.DrawHint(SpriteBatch, _overlayLayout);
+                }
+
                 SwitchFpsCounter.Draw(SpriteBatch, null);
             }
 

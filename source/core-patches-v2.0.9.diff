@@ -266,10 +266,10 @@ index 4fe4ae5..1483d1a 100644
          private readonly Rectangle _recHide = new Rectangle(167, 103, 9, 9);
          private readonly Rectangle _recIcon = new Rectangle(161, 1, 30, 30);
 diff --git a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/OverlayManager.cs b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/OverlayManager.cs
-index bf8e2e3..da031c3 100644
+index bf8e2e3..fd4ed13 100644
 --- a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/OverlayManager.cs
 +++ b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/OverlayManager.cs
-@@ -44,8 +44,35 @@ namespace ProjectZ.InGame.Overlay
+@@ -44,8 +44,42 @@ namespace ProjectZ.InGame.Overlay
          public AchievementOverlay AchievementOverlay;
  
          private InventoryOverlay _inventoryOverlay;
@@ -301,6 +301,13 @@ index bf8e2e3..da031c3 100644
 +
 +        // Idem para la pestana de mazmorra del panel companion.
 +        public DungeonOverlay DungeonOverlayRef => _dungeonOverlay;
++
++        /// <summary>
++        /// true si no hay ningun menu del juego abierto (mapa, inventario, foto, secuencia).
++        /// El overlay del panel companion del port Switch lo usa para no abrirse encima de
++        /// ellos. Solo lectura: no cambia comportamiento.
++        /// </summary>
++        public bool MenuIsClosed => _currentMenuState == MenuState.None;
 +
          private PhotoOverlay _photoOverlay;
  

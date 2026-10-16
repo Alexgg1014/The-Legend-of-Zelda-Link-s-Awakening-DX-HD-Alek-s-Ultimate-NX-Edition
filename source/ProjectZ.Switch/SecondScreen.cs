@@ -44,7 +44,11 @@ namespace ProjectZ.InGame.Things
         /// El panel SOLO existe en Flip Grip. En apaisado el mapa se ve donde siempre: en el
         /// menu de pausa. Superponerlo al juego tapaba parte de la imagen y no aportaba.
         /// </summary>
-        public static bool Enabled => SwitchSettings.Flip != 0;
+        /// <summary>
+        /// El panel se dibuja en FLIP (donde vive en la mitad de abajo) y, desde la v1.2,
+        /// también como overlay en apaisado cuando el jugador lo abre con Minus.
+        /// </summary>
+        public static bool Enabled => SwitchSettings.Flip != 0 || SwitchOverlay.IsOpen;
 
         /// <summary>Último layout calculado — el toque lee esto.</summary>
         public static AleksLayout.Layout CurrentLayout => _layout;
@@ -138,6 +142,7 @@ namespace ProjectZ.InGame.Things
                 DrawMainArea(spriteBatch, panel, main);
                 DrawSidebar(spriteBatch, panel);
                 DrawTabLabels(spriteBatch, panel);
+                DrawFocus(spriteBatch, panel, main);
 
                 spriteBatch.End();
             }
@@ -147,6 +152,10 @@ namespace ProjectZ.InGame.Things
                 SwitchDiag.LogOnce("secondscreen.log", "drawfail",
                     "SecondScreen.Draw fallo: " + e.GetType().Name + ": " + e.Message + " - apagando");
                 SwitchSettings.Flip = 0;
+                // Y cerrar el overlay: si no, en apaisado seguiría reventando cada frame (ahí
+                // poner Flip a 0 no apaga nada, porque ya estaba a 0) y además dejaría el
+                // juego congelado para siempre.
+                SwitchOverlay.ForceClose();
             }
         }
 
@@ -542,6 +551,18 @@ namespace ProjectZ.InGame.Things
             return a < hand ? a : 0;
         }
 
+        /// <summary>
+        /// El OTRO slot de mano, el del botón B. Solo lo usa el overlay con mando: con el dedo
+        /// hay un único destino (y arrastrar para elegir), pero con mando tener A y B es justo
+        /// lo que hace útil la pestaña sin pasar por el menú de pausa, como en el TMC.
+        /// </summary>
+        public static int EquipTargetSlotB(GameManager gm)
+        {
+            var hand = HandSlotCount(gm);
+            var b = GameSettings.SwapButtons ? 1 : 0;
+            return b < hand ? b : EquipTargetSlot(gm);
+        }
+
         /// <summary>Arrastre en curso: Equipment[DragIndex] bajo el dedo (px del panel), slot bajo el dedo.</summary>
         public static int DragIndex = -1;
         public static int DragPanelX, DragPanelY;
@@ -596,7 +617,110 @@ namespace ProjectZ.InGame.Things
         public const int HitHandSlot = 300;
         public const int HitBagItem = 200;
 
+        /// <summary>
+        /// Como HitBagItem pero al slot de B. Solo lo genera el overlay con mando (botón B);
+        /// el toque nunca lo produce. Va en 400 y no justo detrás de HitBagItem para que no
+        /// pueda solaparse si algún día crece Equipment.
+        /// </summary>
+        public const int HitBagItemB = 400;
+
         private const int BagCols = 4;
+
+        // ------------------------------------------------------------------ foco del mando
+        //
+        // En FLIP el panel se maneja con el dedo y no hay foco. En el overlay de apaisado
+        // (v1.2) se maneja con la cruceta, así que hace falta saber qué elemento está
+        // seleccionado y dibujarlo. Lo resuelve SecondScreen y no SwitchOverlay porque aquí
+        // ya están la geometría y el pincel; fuera habría que duplicar las dos.
+
+        /// <summary>Área principal del panel (todo menos la barra de pestañas y la lateral).</summary>
+        public static Rectangle MainRect(Rectangle panel) => R(panel, MainX, MainY, MainW, MainH);
+
+        /// <summary>Cuántos elementos enfocables tiene la pestaña actual. 0 = no hay foco.</summary>
+        public static int FocusCount()
+        {
+            switch (SecondScreenState.Current)
+            {
+                case SecondScreenState.Tab.Settings:
+                    return SettingsRowCount;
+                case SecondScreenState.Tab.Equipment:
+                {
+                    var gm = Game1.GameManager;
+                    if (gm == null || gm.Equipment == null)
+                        return 0;
+                    return Math.Max(0, gm.Equipment.Length - HandSlotCount(gm));
+                }
+                default:
+                    return 0;
+            }
+        }
+
+        /// <summary>Columnas del foco: la bolsa es una rejilla, AJUSTES es una lista.</summary>
+        public static int FocusColumns() =>
+            SecondScreenState.Current == SecondScreenState.Tab.Equipment ? BagCols : 1;
+
+        /// <summary>
+        /// Código de HitTest equivalente a "activar el elemento enfocado". Devolver lo mismo
+        /// que devolvería un toque es lo que garantiza que mando y dedo hagan EXACTAMENTE lo
+        /// mismo: SwitchGame despacha los dos por el mismo sitio.
+        /// </summary>
+        public static int FocusHit(int focus, bool toBSlot = false)
+        {
+            if (focus < 0 || focus >= FocusCount())
+                return -1;
+            switch (SecondScreenState.Current)
+            {
+                case SecondScreenState.Tab.Settings:
+                    return toBSlot ? -1 : HitSettingsRow + focus;
+                case SecondScreenState.Tab.Equipment:
+                {
+                    var gm = Game1.GameManager;
+                    if (gm == null)
+                        return -1;
+                    var index = HandSlotCount(gm) + focus;
+                    return (toBSlot ? HitBagItemB : HitBagItem) + index;
+                }
+                default:
+                    return -1;
+            }
+        }
+
+        private static bool TryFocusRect(Rectangle panel, Rectangle main, int focus, out Rectangle rect)
+        {
+            rect = Rectangle.Empty;
+            if (focus < 0 || focus >= FocusCount())
+                return false;
+            switch (SecondScreenState.Current)
+            {
+                case SecondScreenState.Tab.Settings:
+                    rect = SettingsRowRect(main, panel, focus);
+                    return true;
+                case SecondScreenState.Tab.Equipment:
+                    rect = BagCellRect(main, panel, focus);
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>Marco del elemento enfocado. Solo en el overlay de apaisado.</summary>
+        private static void DrawFocus(SpriteBatch spriteBatch, Rectangle panel, Rectangle main)
+        {
+            if (!SwitchOverlay.IsOpen)
+                return;
+            Rectangle r;
+            if (!TryFocusRect(panel, main, SwitchOverlay.Focus, out r))
+                return;
+
+            var u = U(panel);
+            var t = Math.Max(2, (int)Math.Round(3 * u));
+            var color = SwitchHudDraw.TunicBlue;
+            // Marco de 4 tiras: más barato y más nítido que escalar una textura de borde.
+            spriteBatch.Draw(_pixel, new Rectangle(r.X - t, r.Y - t, r.Width + t * 2, t), color);
+            spriteBatch.Draw(_pixel, new Rectangle(r.X - t, r.Bottom, r.Width + t * 2, t), color);
+            spriteBatch.Draw(_pixel, new Rectangle(r.X - t, r.Y, t, r.Height), color);
+            spriteBatch.Draw(_pixel, new Rectangle(r.Right, r.Y, t, r.Height), color);
+        }
 
         /// <summary>Celda de la bolsa para Equipment[index] (index >= slots de mano).</summary>
         private static Rectangle BagCellRect(Rectangle main, Rectangle panel, int bagPos)
