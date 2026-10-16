@@ -1,6 +1,7 @@
 #if SWITCH
 using System;
 using Microsoft.Xna.Framework.Graphics;
+using ProjectZ.InGame.Graphics;
 using ProjectZ.InGame.Things;
 
 namespace ProjectZ

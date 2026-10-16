@@ -12,7 +12,8 @@ namespace ProjectZ
     /// leen y escriben SwitchSettings, así que siempre están de acuerdo.
     ///
     /// Las cadenas no están en los .lng del usuario: se inyectan en Language.Strings del
-    /// idioma activo (español si es "esp", inglés en el resto). Así no hay que tocar Data/.
+    /// idioma activo. Así no hay que tocar Data/. Las traducciones viven en SwitchStrings,
+    /// junto a las del panel: eng/esp/por/fre/deu/ita, y el resto cae al inglés.
     /// </summary>
     internal sealed class SwitchVideoOptions : IPlatformVideoOptions
     {
@@ -27,23 +28,17 @@ namespace ProjectZ
                 return;
             _injectedLanguage = lm.CurrentLanguageIndex;
 
-            var esp = lm.CurrentLanguageCode == "esp";
             var d = lm.Strings;
-            d["switch_video_render"]      = esp ? "Resolucion Switch" : "Switch resolution";
-            d["switch_video_fps"]         = esp ? "Limite de FPS" : "FPS limit";
-            d["switch_video_flip"]        = esp ? "Flip Grip (vertical)" : "Flip Grip (portrait)";
-            d["switch_video_hidehud"]     = esp ? "Ocultar HUD en Flip Grip" : "Hide HUD in Flip Grip";
-            d["switch_video_uilarge"]     = esp ? "UI grande (menus, dialogos)" : "Large UI (menus, dialogs)";
-            d["tooltip_switch_uilarge"]   = esp ? "Un paso mas de escala de UI a 720. El menu de pausa puede salirse un poco por los lados."
-                                                : "One extra UI scale step at 720. The pause menu may overflow the sides slightly.";
-            d["tooltip_switch_render"]    = esp ? "720 = pantalla portatil, 60 fps. 1080 = mas nitido en dock, 30 fps."
-                                                : "720 = handheld screen, 60 fps. 1080 = sharper docked, 30 fps.";
-            d["tooltip_switch_fps"]       = esp ? "Timestep fijo. 60 recomendado con resolucion 720."
-                                                : "Fixed timestep. 60 recommended with 720 resolution.";
-            d["tooltip_switch_flip"]      = esp ? "Consola en vertical: juego arriba, panel companion abajo. Tambien L+R+X."
-                                                : "Portrait console: game on top, companion panel below. Also L+R+X.";
-            d["tooltip_switch_hidehud"]   = esp ? "La barra lateral del panel ya lleva corazones, objetos y rupias."
-                                                : "The panel sidebar already shows hearts, items and rupees.";
+            d["switch_video_render"]      = SwitchStrings.Get("video_render");
+            d["switch_video_fps"]         = SwitchStrings.Get("video_fps");
+            d["switch_video_flip"]        = SwitchStrings.Get("video_flip");
+            d["switch_video_hidehud"]     = SwitchStrings.Get("video_hidehud");
+            d["switch_video_uilarge"]     = SwitchStrings.Get("video_uilarge");
+            d["tooltip_switch_render"]    = SwitchStrings.Get("tip_render");
+            d["tooltip_switch_fps"]       = SwitchStrings.Get("tip_fps");
+            d["tooltip_switch_flip"]      = SwitchStrings.Get("tip_flip");
+            d["tooltip_switch_hidehud"]   = SwitchStrings.Get("tip_hidehud");
+            d["tooltip_switch_uilarge"]   = SwitchStrings.Get("tip_uilarge");
         }
 
         public void AddVideoOptions(InterfaceListLayout content, List<string> tooltips,

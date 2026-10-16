@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ProjectZ.InGame.Controls;
 using ProjectZ.InGame.GameObjects.Base;
+using ProjectZ.InGame.Graphics;
 using ProjectZ.InGame.SaveLoad;
 
 namespace ProjectZ.InGame.Things

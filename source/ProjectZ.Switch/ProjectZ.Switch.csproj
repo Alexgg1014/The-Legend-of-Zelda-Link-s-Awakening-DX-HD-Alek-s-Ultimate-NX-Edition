@@ -3,7 +3,7 @@
   <!-- Main configuration. -->
   <PropertyGroup>
     <AssemblyName>ProjectZ.Switch</AssemblyName>
-    <Version>2.0.6</Version>
+    <Version>2.0.9</Version>
     <TargetFramework>net9.0</TargetFramework>
     <TargetOS>switch</TargetOS>
     <SwitchBuild>true</SwitchBuild>
@@ -79,7 +79,7 @@
   </ItemGroup>
 
   <!-- Instalador in-game (v1.1): parches VCDIFF de bighead (patches_android_gl + patches_allplatforms
-       del patcher v2.0.8, con su permiso explicito) + extras, embebidos en el NRO. Se regenera con
+       del patcher v2.0.9, con su permiso explicito) + extras, embebidos en el NRO. Se regenera con
        _switchbuild/tools/assets_bundle.py bundle. AssetInstaller.ExpectedAssetVersion debe coincidir
        con version.txt del ZIP (se comprueba en tiempo de ejecucion). -->
   <ItemGroup>

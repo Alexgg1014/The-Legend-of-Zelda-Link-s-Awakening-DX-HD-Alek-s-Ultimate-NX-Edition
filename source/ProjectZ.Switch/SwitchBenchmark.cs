@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ProjectZ.InGame.Graphics;
 
 namespace ProjectZ.InGame.Things
 {

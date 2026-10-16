@@ -24,6 +24,15 @@ namespace ProjectZ.InGame.Things
                 ["hint_settings"] = "TAP A ROW TO CHANGE IT",
                 ["hint_equip"] = "TAP AN ITEM = TO {0}   DRAG IT TO A BUTTON TO CHOOSE",
                 ["photos"] = "PHOTOS", ["trade"] = "TRADING SEQUENCE",
+                // Filas del port en el menu Ajustes -> Video del juego (SwitchVideoOptions).
+                ["video_render"] = "Switch resolution", ["video_fps"] = "FPS limit",
+                ["video_flip"] = "Flip Grip (portrait)", ["video_hidehud"] = "Hide HUD in Flip Grip",
+                ["video_uilarge"] = "Large UI (menus, dialogs)",
+                ["tip_render"] = "720 = handheld screen, 60 fps. 1080 = sharper docked, 30 fps.",
+                ["tip_fps"] = "Fixed timestep. 60 recommended with 720 resolution.",
+                ["tip_flip"] = "Portrait console: game on top, companion panel below. Also L+R+X.",
+                ["tip_hidehud"] = "The panel sidebar already shows hearts, items and rupees.",
+                ["tip_uilarge"] = "One extra UI scale step at 720. The pause menu may overflow the sides slightly.",
             },
             ["esp"] = new Dictionary<string, string>
             {
@@ -37,6 +46,14 @@ namespace ProjectZ.InGame.Things
                 ["hint_settings"] = "TOCA UNA FILA PARA CAMBIARLA",
                 ["hint_equip"] = "TOCA UN OBJETO = A {0}   ARRASTRALO A UN BOTON PARA ELEGIR",
                 ["photos"] = "FOTOS", ["trade"] = "INTERCAMBIO",
+                ["video_render"] = "Resolucion Switch", ["video_fps"] = "Limite de FPS",
+                ["video_flip"] = "Flip Grip (vertical)", ["video_hidehud"] = "Ocultar HUD en Flip Grip",
+                ["video_uilarge"] = "UI grande (menus, dialogos)",
+                ["tip_render"] = "720 = pantalla portatil, 60 fps. 1080 = mas nitido en dock, 30 fps.",
+                ["tip_fps"] = "Timestep fijo. 60 recomendado con resolucion 720.",
+                ["tip_flip"] = "Consola en vertical: juego arriba, panel companion abajo. Tambien L+R+X.",
+                ["tip_hidehud"] = "La barra lateral del panel ya lleva corazones, objetos y rupias.",
+                ["tip_uilarge"] = "Un paso mas de escala de UI a 720. El menu de pausa puede salirse un poco por los lados.",
             },
             ["por"] = new Dictionary<string, string>
             {
@@ -50,6 +67,14 @@ namespace ProjectZ.InGame.Things
                 ["hint_settings"] = "TOQUE NUMA LINHA PARA MUDAR",
                 ["hint_equip"] = "TOQUE NUM ITEM = PARA {0}   ARRASTE ATE UM BOTAO PARA ESCOLHER",
                 ["photos"] = "FOTOS", ["trade"] = "TROCAS",
+                ["video_render"] = "Resolucao Switch", ["video_fps"] = "Limite de FPS",
+                ["video_flip"] = "Flip Grip (vertical)", ["video_hidehud"] = "Ocultar HUD no Flip Grip",
+                ["video_uilarge"] = "UI grande (menus, dialogos)",
+                ["tip_render"] = "720 = tela portatil, 60 fps. 1080 = mais nitido na dock, 30 fps.",
+                ["tip_fps"] = "Timestep fixo. 60 recomendado com resolucao 720.",
+                ["tip_flip"] = "Console na vertical: jogo em cima, painel companion embaixo. Tambem L+R+X.",
+                ["tip_hidehud"] = "A barra lateral do painel ja mostra coracoes, itens e rubis.",
+                ["tip_uilarge"] = "Um passo a mais de escala de UI a 720. O menu de pausa pode passar um pouco das bordas.",
             },
             ["fre"] = new Dictionary<string, string>
             {
@@ -63,6 +88,14 @@ namespace ProjectZ.InGame.Things
                 ["hint_settings"] = "TOUCHEZ UNE LIGNE POUR LA CHANGER",
                 ["hint_equip"] = "TOUCHEZ UN OBJET = SUR {0}   GLISSEZ-LE SUR UN BOUTON",
                 ["photos"] = "PHOTOS", ["trade"] = "ECHANGES",
+                ["video_render"] = "Resolution Switch", ["video_fps"] = "Limite de FPS",
+                ["video_flip"] = "Flip Grip (portrait)", ["video_hidehud"] = "Masquer le HUD en Flip Grip",
+                ["video_uilarge"] = "Grande UI (menus, dialogues)",
+                ["tip_render"] = "720 = ecran portable, 60 fps. 1080 = plus net en dock, 30 fps.",
+                ["tip_fps"] = "Pas de temps fixe. 60 recommande avec la resolution 720.",
+                ["tip_flip"] = "Console a la verticale : jeu en haut, panneau companion en bas. Aussi L+R+X.",
+                ["tip_hidehud"] = "La barre laterale du panneau affiche deja coeurs, objets et rubis.",
+                ["tip_uilarge"] = "Un cran de plus d'echelle d'UI en 720. Le menu pause peut deborder un peu sur les cotes.",
             },
             ["deu"] = new Dictionary<string, string>
             {
@@ -76,6 +109,14 @@ namespace ProjectZ.InGame.Things
                 ["hint_settings"] = "TIPPE EINE ZEILE ZUM AENDERN",
                 ["hint_equip"] = "ITEM TIPPEN = AUF {0}   AUF EINEN KNOPF ZIEHEN ZUM WAEHLEN",
                 ["photos"] = "FOTOS", ["trade"] = "TAUSCHKETTE",
+                ["video_render"] = "Switch-Aufloesung", ["video_fps"] = "FPS-Limit",
+                ["video_flip"] = "Flip Grip (Hochformat)", ["video_hidehud"] = "HUD im Flip Grip ausblenden",
+                ["video_uilarge"] = "Grosse UI (Menues, Dialoge)",
+                ["tip_render"] = "720 = Handheld-Bildschirm, 60 fps. 1080 = schaerfer im Dock, 30 fps.",
+                ["tip_fps"] = "Fester Zeitschritt. 60 empfohlen mit Aufloesung 720.",
+                ["tip_flip"] = "Konsole hochkant: Spiel oben, Companion-Panel unten. Auch L+R+X.",
+                ["tip_hidehud"] = "Die Seitenleiste des Panels zeigt bereits Herzen, Items und Rubine.",
+                ["tip_uilarge"] = "Eine UI-Stufe groesser bei 720. Das Pausenmenue kann seitlich leicht ueberstehen.",
             },
             ["ita"] = new Dictionary<string, string>
             {
@@ -89,6 +130,14 @@ namespace ProjectZ.InGame.Things
                 ["hint_settings"] = "TOCCA UNA RIGA PER CAMBIARLA",
                 ["hint_equip"] = "TOCCA UN OGGETTO = SU {0}   TRASCINALO SU UN TASTO PER SCEGLIERE",
                 ["photos"] = "FOTO", ["trade"] = "SCAMBI",
+                ["video_render"] = "Risoluzione Switch", ["video_fps"] = "Limite di FPS",
+                ["video_flip"] = "Flip Grip (verticale)", ["video_hidehud"] = "Nascondi HUD in Flip Grip",
+                ["video_uilarge"] = "UI grande (menu, dialoghi)",
+                ["tip_render"] = "720 = schermo portatile, 60 fps. 1080 = piu nitido in dock, 30 fps.",
+                ["tip_fps"] = "Timestep fisso. 60 consigliato con risoluzione 720.",
+                ["tip_flip"] = "Console in verticale: gioco sopra, pannello companion sotto. Anche L+R+X.",
+                ["tip_hidehud"] = "La barra laterale del pannello mostra gia cuori, oggetti e rupie.",
+                ["tip_uilarge"] = "Un passo in piu di scala UI a 720. Il menu di pausa puo sporgere un poco ai lati.",
             },
         };
 

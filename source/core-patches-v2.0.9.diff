@@ -1,8 +1,8 @@
 diff --git a/ladxhd_game_source_code/ProjectZ.Core/Game1.cs b/ladxhd_game_source_code/ProjectZ.Core/Game1.cs
-index 518a7c4..09743eb 100644
+index 8780a6c..068cc0e 100644
 --- a/ladxhd_game_source_code/ProjectZ.Core/Game1.cs
 +++ b/ladxhd_game_source_code/ProjectZ.Core/Game1.cs
-@@ -48,6 +48,26 @@ namespace ProjectZ
+@@ -49,6 +49,26 @@ namespace ProjectZ
  
          public static int WindowWidth;
          public static int WindowHeight;
@@ -29,7 +29,7 @@ index 518a7c4..09743eb 100644
          public static int WindowWidthEnd;
          public static int WindowHeightEnd;
          public static int RenderWidth;
-@@ -76,6 +96,16 @@ namespace ProjectZ
+@@ -77,6 +97,16 @@ namespace ProjectZ
          private static RenderTarget2D _renderTarget1;
          private static RenderTarget2D _renderTarget2;
          private static RenderTarget2D _finalRenderTarget;
@@ -46,7 +46,7 @@ index 518a7c4..09743eb 100644
          private static bool _initRenderTargets;
  
          private const double _startDelayTime = 1.5;
-@@ -84,6 +114,9 @@ namespace ProjectZ
+@@ -85,6 +115,9 @@ namespace ProjectZ
  
          public static int MaxGameScale;
          public static int UiScale;
@@ -56,7 +56,7 @@ index 518a7c4..09743eb 100644
          public static bool ScaleChanged;
  
          public static bool WasActive;
-@@ -389,7 +422,13 @@ namespace ProjectZ
+@@ -390,7 +423,13 @@ namespace ProjectZ
                  WindowHeightEnd = 0;
              }
  
@@ -71,7 +71,7 @@ index 518a7c4..09743eb 100644
              {
                  var pp = Graphics.GraphicsDevice.PresentationParameters;
                  if (WindowWidth != pp.BackBufferWidth || WindowHeight != pp.BackBufferHeight)
-@@ -767,9 +806,22 @@ namespace ProjectZ
+@@ -768,9 +807,22 @@ namespace ProjectZ
              if (Graphics.GraphicsDevice == null)
                  return;
  
@@ -97,7 +97,7 @@ index 518a7c4..09743eb 100644
  
              if (w <= 0 || h <= 0)
              {
-@@ -790,7 +842,12 @@ namespace ProjectZ
+@@ -791,7 +843,12 @@ namespace ProjectZ
          public void ForceRecalculateScaling()
          {
              int w = 0, h = 0;
@@ -111,7 +111,7 @@ index 518a7c4..09743eb 100644
              {
                  var pp = Graphics.GraphicsDevice.PresentationParameters;
                  w = pp.BackBufferWidth;
-@@ -868,7 +925,14 @@ namespace ProjectZ
+@@ -869,7 +926,14 @@ namespace ProjectZ
                  }
              }
              // Scale of the user interface.
@@ -217,10 +217,10 @@ index 8db05ec..55f3306 100644
                      // fade this is usually all but one or two of them.
                      if (!_nodeDirty[x, y])
 diff --git a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/DungeonOverlay.cs b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/DungeonOverlay.cs
-index e223f81..ec387c9 100644
+index bb60ffc..b3876f2 100644
 --- a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/DungeonOverlay.cs
 +++ b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/DungeonOverlay.cs
-@@ -10,6 +10,11 @@ namespace ProjectZ.InGame.Overlay
+@@ -11,6 +11,11 @@ namespace ProjectZ.InGame.Overlay
      {
          private RenderTarget2D _renderTarget;
  
@@ -233,10 +233,10 @@ index e223f81..ec387c9 100644
  
          private Rectangle _backgroundTop;
 diff --git a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/InventoryOverlay.cs b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/InventoryOverlay.cs
-index 99f91bf..6fad1bb 100644
+index 43ee815..7c620e2 100644
 --- a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/InventoryOverlay.cs
 +++ b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/InventoryOverlay.cs
-@@ -13,6 +13,11 @@ namespace ProjectZ.InGame.Overlay
+@@ -14,6 +14,11 @@ namespace ProjectZ.InGame.Overlay
  
          private RenderTarget2D _renderTarget;
  
@@ -249,10 +249,10 @@ index 99f91bf..6fad1bb 100644
          private readonly Rectangle _background1 = new Rectangle(0, 26, 268, 182);
  
 diff --git a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/MapOverlay.cs b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/MapOverlay.cs
-index fc56456..1be922f 100644
+index 4fe4ae5..1483d1a 100644
 --- a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/MapOverlay.cs
 +++ b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/MapOverlay.cs
-@@ -17,6 +17,12 @@ namespace ProjectZ.InGame.Overlay
+@@ -18,6 +18,12 @@ namespace ProjectZ.InGame.Overlay
  
          private RenderTarget2D _renderTarget;
  
@@ -266,10 +266,10 @@ index fc56456..1be922f 100644
          private readonly Rectangle _recHide = new Rectangle(167, 103, 9, 9);
          private readonly Rectangle _recIcon = new Rectangle(161, 1, 30, 30);
 diff --git a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/OverlayManager.cs b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/OverlayManager.cs
-index 4aadec2..0425c11 100644
+index bf8e2e3..da031c3 100644
 --- a/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/OverlayManager.cs
 +++ b/ladxhd_game_source_code/ProjectZ.Core/InGame/Overlay/OverlayManager.cs
-@@ -42,8 +42,35 @@ namespace ProjectZ.InGame.Overlay
+@@ -44,8 +44,35 @@ namespace ProjectZ.InGame.Overlay
          public AchievementOverlay AchievementOverlay;
  
          private InventoryOverlay _inventoryOverlay;
@@ -306,10 +306,10 @@ index 4aadec2..0425c11 100644
  
          private Dictionary<string, GameSequence> _gameSequences = new Dictionary<string, GameSequence>();
 diff --git a/ladxhd_game_source_code/ProjectZ.Core/InGame/Pages/Settings/VideoSettingsPage.cs b/ladxhd_game_source_code/ProjectZ.Core/InGame/Pages/Settings/VideoSettingsPage.cs
-index cc2e861..b8f05f2 100644
+index bd84e37..dcc00cf 100644
 --- a/ladxhd_game_source_code/ProjectZ.Core/InGame/Pages/Settings/VideoSettingsPage.cs
 +++ b/ladxhd_game_source_code/ProjectZ.Core/InGame/Pages/Settings/VideoSettingsPage.cs
-@@ -113,6 +113,10 @@ namespace ProjectZ.InGame.Pages
+@@ -114,6 +114,10 @@ namespace ProjectZ.InGame.Pages
              _contentLayout.AddElement(_toggleEpilepsySafe);
              _tooltips.Add("tooltip_video_epilepsysafe");
  

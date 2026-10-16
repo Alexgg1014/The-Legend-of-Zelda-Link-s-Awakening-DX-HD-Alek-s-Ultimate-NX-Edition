@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using ProjectZ.InGame.Graphics;
 using ProjectZ.InGame.Things;
 using ProjectZ.Switch.Install;
 

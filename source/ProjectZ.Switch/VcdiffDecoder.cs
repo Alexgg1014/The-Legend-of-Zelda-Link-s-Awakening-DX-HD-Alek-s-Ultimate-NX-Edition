@@ -14,7 +14,8 @@ namespace ProjectZ.Switch.Install
     /// formato y también el estándar de tres secciones. No soporta tablas de códigos
     /// personalizadas ni compresión secundaria (el patcher no las usa).
     ///
-    /// Validado en PC contra los 570 ficheros de v2.0.8 generados por el patcher oficial.
+    /// Validado en PC contra los 570 ficheros de v2.0.8 generados por el patcher oficial (el formato
+    /// no ha cambiado en v2.0.9: los parches solo difieren en los .lng).
     /// </summary>
     public static class VcdiffDecoder
     {

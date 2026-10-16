@@ -21,7 +21,7 @@ REF = os.path.join(SB, "Links Awakening DX HD")  # instalacion v2.0.8 Windows+GL
 V100 = os.path.join(SB, "v100_test")
 SEVENZ = shutil.which("7z") or r"C:\Program Files\7-Zip\7z.exe"
 
-ASSET_VERSION = "2.0.8"
+ASSET_VERSION = "2.0.9"
 
 
 def fnv64(path):

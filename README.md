@@ -2,7 +2,7 @@
 
 <h1 align="center">The Legend of Zelda: Link's Awakening DX HD — Alek's Ultimate NX Edition</h1>
 
-<p align="center">Nintendo Switch homebrew port of <a href="https://gitlab.com/bighead.0/ladxhd_updated">bighead's <i>ladxhd_updated</i></a> (v2.0.8) — 60 fps in handheld, Flip Grip portrait mode with a touch companion panel, in-game Switch settings. Since v1.1 it installs itself on the console from your v1.0.0 copy: no PC, no patcher.</p>
+<p align="center">Nintendo Switch homebrew port of <a href="https://gitlab.com/bighead.0/ladxhd_updated">bighead's <i>ladxhd_updated</i></a> (v2.0.9) — 60 fps in handheld, Flip Grip portrait mode with a touch companion panel, in-game Switch settings. Since v1.1 it installs itself on the console from your v1.0.0 copy: no PC, no patcher.</p>
 
 <p align="center"><a href="#english">English</a> · <a href="#español">Español</a> · <a href="https://gbatemp.net/threads/release-zelda-links-awakening-dx-hd-aleks-ultimate-nx-edition-switch-homebrew-60fps-flip-grip-touch-second-screen.684512/">GBAtemp thread</a> · <a href="https://github.com/Alexgg1014/The-Legend-of-Zelda-Link-s-Awakening-DX-HD-Alek-s-Ultimate-NX-Edition/releases">Releases</a></p>
 
@@ -32,7 +32,7 @@
   - **⚙ SETTINGS** — fps limit, fps counter, game HUD on/off, UI blur, Flip Grip, resolution, panel HUD size, game UI size, and an **Optimized Settings** preset (two taps to confirm).
 - **Sidebar HUD** on the panel (hearts, equipped items in the button layout, rupees, keys) so the game HUD can be hidden in Flip Grip.
 - **Switch options inside the game's own menu** — Pause → Settings → Video: resolution, fps limit, Flip Grip, hide HUD, large UI.
-- Panel translated to **English, Spanish, Portuguese, French, German and Italian** (follows the game language). Story guide: English and Spanish.
+- Panel **and** the Switch rows in the game's own Video menu translated to **English, Spanish, Portuguese, French, German and Italian** (follows the game language). The story guide is in all six too, using each language's official place, dungeon and character names from the game's own files.
 - Zero new art: everything on the panel is drawn from the game's own sprites, fonts and colors (respects your LAHDMods).
 
 ### Requirements
@@ -47,7 +47,7 @@
 1. On the SD card create `sdmc:/switch/zelda-ladxhd/` and copy into it:
    - `ProjectZ.Switch.nro` (from this repo's release)
    - a folder named `original/` with your **untouched v1.0.0** `Content/` and `Data/` folders inside (copying the whole game folder into `original/` also works)
-2. Launch from hbmenu. The first start shows an install screen: the NRO checks that `original/` really is v1.0.0, applies bighead's v2.0.8 patches on the console (about a minute) and creates `Content/` and `Data/` next to the NRO. Then the game starts.
+2. Launch from hbmenu. The first start shows an install screen: the NRO checks that `original/` really is v1.0.0, applies bighead's v2.0.9 patches on the console (about a minute) and creates `Content/` and `Data/` next to the NRO. Then the game starts.
 3. Keep `original/`: future updates re-patch from it. If you'd rather save space, you can delete it after installing and copy it back when a new version comes out.
 
 If you already installed v1.0.0 the old way (patcher on PC + copying `Content`/`Data`), nothing changes: the NRO sees the folders and starts the game as before.
@@ -111,7 +111,7 @@ This port was developed by Alexgg1014 **with Claude (Anthropic) as a coding assi
   - **⚙ AJUSTES** — límite de fps, contador, HUD del juego, desenfoque UI, Flip Grip, resolución, tamaño del HUD del panel, tamaño de la UI del juego y un preset de **Ajustes Optimizados** (dos toques para confirmar).
 - **HUD en la barra lateral** del panel (corazones, objetos equipados en la forma de los botones, rupias, llaves), para poder ocultar el HUD del juego en Flip Grip.
 - **Opciones Switch dentro del menú del juego**: Pausa → Ajustes → Vídeo: resolución, límite de fps, Flip Grip, ocultar HUD, UI grande.
-- Panel traducido a **inglés, español, portugués, francés, alemán e italiano** (sigue el idioma del juego). Guía de historia: inglés y español.
+- El panel **y** las filas de Switch del menú Vídeo del propio juego, traducidos a **inglés, español, portugués, francés, alemán e italiano** (siguen el idioma del juego). La guía de historia también está en los seis, con los nombres oficiales de lugares, mazmorras y personajes de cada idioma, sacados de los ficheros del propio juego.
 - Cero arte nuevo: todo el panel se dibuja con los sprites, fuentes y colores del propio juego (respeta tus LAHDMods).
 
 ### Requisitos
@@ -126,7 +126,7 @@ This port was developed by Alexgg1014 **with Claude (Anthropic) as a coding assi
 1. En la SD crea `sdmc:/switch/zelda-ladxhd/` y copia dentro:
    - `ProjectZ.Switch.nro` (de la release de este repo)
    - una carpeta `original/` con las carpetas `Content/` y `Data/` de tu **v1.0.0 sin tocar** (también vale copiar la carpeta del juego entera dentro de `original/`)
-2. Lanza desde hbmenu. El primer arranque muestra una pantalla de instalación: el NRO comprueba que `original/` es de verdad v1.0.0, aplica en la consola los parches v2.0.8 de bighead (cosa de un minuto) y crea `Content/` y `Data/` junto al NRO. Después arranca el juego.
+2. Lanza desde hbmenu. El primer arranque muestra una pantalla de instalación: el NRO comprueba que `original/` es de verdad v1.0.0, aplica en la consola los parches v2.0.9 de bighead (cosa de un minuto) y crea `Content/` y `Data/` junto al NRO. Después arranca el juego.
 3. Conserva `original/`: las actualizaciones futuras vuelven a parchear desde ahí. Si prefieres ahorrar espacio, puedes borrarla tras instalar y volver a copiarla cuando salga versión nueva.
 
 Si ya instalaste v1.0.0 a la antigua (patcher en PC + copiar `Content`/`Data`), no cambia nada: el NRO ve las carpetas y arranca el juego como siempre.

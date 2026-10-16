@@ -33,7 +33,7 @@ namespace ProjectZ.Switch.Install
     public sealed class AssetInstaller
     {
         /// <summary>Versión de upstream contra la que se compiló este NRO y cuyos parches lleva.</summary>
-        public const string ExpectedAssetVersion = "2.0.8";
+        public const string ExpectedAssetVersion = "2.0.9";
 
         public const string OriginalFolderName = "original";
         public const string MarkerFileName = "assets-version.txt";
