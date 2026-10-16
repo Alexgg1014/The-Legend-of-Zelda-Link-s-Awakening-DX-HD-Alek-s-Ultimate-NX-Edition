@@ -180,7 +180,11 @@ namespace ProjectZ
                 return;
             if (_dim == null)
             {
-                _dim = new Texture2D(Game1.Graphics.GraphicsDevice, 1, 1);
+                // Mismo motivo que en RefreshCompanionMap: aqui un deref nulo mata el proceso.
+                var device = Game1.Graphics?.GraphicsDevice;
+                if (device == null)
+                    return;
+                _dim = new Texture2D(device, 1, 1);
                 _dim.SetData(new[] { Color.White });
             }
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);

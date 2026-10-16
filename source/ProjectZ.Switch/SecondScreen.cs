@@ -264,7 +264,9 @@ namespace ProjectZ.InGame.Things
             }
 
             var gm = Game1.GameManager;
-            if (gm != null)
+            // Equipment aparte de gm: su deref nulo mata el proceso, no lanza. Si no hay
+            // equipo, tampoco hay nada que golpear aqui.
+            if (gm?.Equipment != null)
             {
                 var hand = HandSlotCount(gm);
                 var cells = HandSlotRects(panel, HandSlotsTop(panel, gm));
@@ -539,8 +541,17 @@ namespace ProjectZ.InGame.Things
 
         // ------------------------------------------------------------------ rombo / EQUIPO
 
+        /// <summary>
+        /// Slots de mano del rombo. Comprueba <c>gm.Equipment</c> a propósito: en este port un
+        /// deref nulo NO es una NullReferenceException capturable, es un Data Abort que mata el
+        /// proceso (misma lección que el mkdir con rutas "sdmc:"), y desde la v1.2 esto se
+        /// alcanza también desde el overlay con mando, que puede estar abierto en momentos en
+        /// los que el toque en FLIP nunca llegaba.
+        /// </summary>
         public static int HandSlotCount(GameManager gm) =>
-            Math.Max(0, Math.Min(Values.HandItemSlots, Math.Min(6, gm.Equipment.Length)));
+            gm?.Equipment == null
+                ? 0
+                : Math.Max(0, Math.Min(Values.HandItemSlots, Math.Min(6, gm.Equipment.Length)));
 
         /// <summary>Slot del botón A del juego (índice 1, o 0 con SwapButtons): destino de un
         /// toque suelto sobre un objeto, como en TMC ALEKS. Arrastrando se elige otro slot.</summary>
@@ -740,7 +751,7 @@ namespace ProjectZ.InGame.Things
         private static void DrawEquipment(SpriteBatch spriteBatch, Rectangle panel, Rectangle main)
         {
             var gm = Game1.GameManager;
-            if (gm == null)
+            if (gm?.Equipment == null)       // deref nulo = Data Abort, no excepcion
                 return;
             var u = U(panel);
             var s4 = Math.Max(1, (int)Math.Round(4 * u));

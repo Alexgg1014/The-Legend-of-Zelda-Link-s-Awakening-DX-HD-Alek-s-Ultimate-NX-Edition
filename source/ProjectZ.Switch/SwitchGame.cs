@@ -399,7 +399,8 @@ namespace ProjectZ
                             var moved = System.Math.Abs(cx - sx0) + System.Math.Abs(cy - sy0) > 24;
                             if (moved && hs >= SecondScreen.HitHandSlot && GameManager != null)
                                 SecondScreen.DragIndex = hs - SecondScreen.HitHandSlot;
-                            else if (moved && hs >= SecondScreen.HitBagItem && hs < SecondScreen.HitHandSlot && GameManager != null &&
+                            else if (moved && hs >= SecondScreen.HitBagItem && hs < SecondScreen.HitHandSlot &&
+                                     GameManager?.Equipment != null &&
                                      GameManager.Equipment[hs - SecondScreen.HitBagItem] != null)
                                 SecondScreen.DragIndex = hs - SecondScreen.HitBagItem;
                         }
@@ -506,7 +507,10 @@ namespace ProjectZ
         private void EquipTo(int from, int toSlot)
         {
             var gm = GameManager;
-            if (gm == null || from < 0 || from >= gm.Equipment.Length || toSlot < 0 || toSlot >= gm.Equipment.Length || from == toSlot)
+            // gm.Equipment comprobado aparte: un deref nulo aqui mata el proceso, no lanza.
+            if (gm?.Equipment == null)
+                return;
+            if (from < 0 || from >= gm.Equipment.Length || toSlot < 0 || toSlot >= gm.Equipment.Length || from == toSlot)
                 return;
             var item = gm.Equipment[from];
             var prev = gm.Equipment[toSlot];
@@ -544,6 +548,25 @@ namespace ProjectZ
         /// CONGELAR el juego (overlay abierto, o cerrado pero esperando a que se suelte Minus).
         /// </summary>
         private bool PollOverlay()
+        {
+            // Red de seguridad: este metodo decide si el juego se congela, asi que si algo de
+            // aqui dentro falla, el peor caso tiene que ser "el panel no se abre", nunca "el
+            // juego se queda tieso". No cubre un Data Abort (eso no se captura); para eso
+            // estan los null checks explicitos de SecondScreen y EquipTo.
+            try
+            {
+                return PollOverlayCore();
+            }
+            catch (System.Exception e)
+            {
+                SwitchDiag.LogOnce("secondscreen.log", "overlayfail",
+                    "PollOverlay fallo: " + e.GetType().Name + ": " + e.Message + " - cerrando overlay");
+                SwitchOverlay.ForceClose();
+                return false;
+            }
+        }
+
+        private bool PollOverlayCore()
         {
             var openBtn = false;
             var up = false; var down = false; var left = false; var right = false;
