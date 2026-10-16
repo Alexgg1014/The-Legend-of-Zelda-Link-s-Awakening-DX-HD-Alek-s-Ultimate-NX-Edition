@@ -1059,12 +1059,18 @@ namespace ProjectZ
 
             base.Draw(gameTime);
 
+            // Una sola lectura comprobada para las dos ramas. Aqui el dispositivo esta vivo
+            // (acabamos de dibujar el frame), pero un deref nulo en este port mata el proceso
+            // en vez de lanzar, asi que no se deja al azar.
+            var pp = Graphics?.GraphicsDevice?.PresentationParameters;
+            if (pp == null)
+                return;
+
             if (_flipActive)
             {
                 // FLIP: recomponer el frame rotado sobre el lienzo vertical. Todo lo que se
                 // dibuje a partir de aqui va en coordenadas del lienzo 720x1280 y la
                 // transformacion se encarga de la rotacion.
-                var pp = Graphics.GraphicsDevice.PresentationParameters;
                 SwitchFlipCompositor.Compose(SpriteBatch, _flipLayout,
                     pp.BackBufferWidth, pp.BackBufferHeight);
 
@@ -1080,7 +1086,6 @@ namespace ProjectZ
                 // Apaisado: el panel aparece como overlay cuando el jugador lo abre con Minus.
                 if (SwitchOverlay.IsOpen)
                 {
-                    var pp = Graphics.GraphicsDevice.PresentationParameters;
                     var w = pp.BackBufferWidth;
                     var h = pp.BackBufferHeight;
                     _overlayLayout = SwitchOverlay.BuildLayout(w, h);

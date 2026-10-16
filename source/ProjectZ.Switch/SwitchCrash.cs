@@ -331,21 +331,29 @@ namespace ProjectZ.InGame.Things
             }
         }
 
+        // OJO: SafeGet es un try/catch, y un try/catch NO atrapa un deref nulo en este port
+        // (es un Data Abort que mata el proceso, no una excepción). Esto corre cuando el juego
+        // YA está mal, que es justo cuando UiPageManager o GameManager pueden no existir, así
+        // que aquí hay que encadenar con "?." aunque parezca redundante. Es la lección del §5b:
+        // la sonda de diagnóstico fue lo que mataba el proceso en consola.
         private static void AppendNavState(StringBuilder sb)
         {
-            Line(sb, "pageStackDepth", SafeGet(() => Game1.UiPageManager.PageStack.Count.ToString()));
+            Line(sb, "pageStackDepth", SafeGet(() => Game1.UiPageManager?.PageStack?.Count.ToString()));
             Line(sb, "pageStack", SafeGet(() =>
             {
-                var stack = Game1.UiPageManager.PageStack;
+                var pm = Game1.UiPageManager;
+                var stack = pm?.PageStack;
+                var inside = pm?.InsideElement;
+                if (stack == null) return null;
                 var s = new StringBuilder();
                 for (int i = 0; i < stack.Count; i++)
                 {
                     s.Append('[').Append(i).Append(']').Append(stack[i]?.Name ?? "<null type>");
-                    var present = Game1.UiPageManager.InsideElement.ContainsKey(stack[i]);
+                    var present = inside != null && stack[i] != null && inside.ContainsKey(stack[i]);
                     if (!present) s.Append("  !! NOT IN InsideElement !!");
                     else
                     {
-                        var pg = Game1.UiPageManager.InsideElement[stack[i]];
+                        var pg = inside[stack[i]];
                         s.Append("#").Append(pg == null ? "<null page>" : pg.GetHashCode().ToString("X"));
                     }
                     s.Append(i + 1 < stack.Count ? " -> " : "");
@@ -354,17 +362,17 @@ namespace ProjectZ.InGame.Things
             }));
             Line(sb, "currentPage", SafeGet(() =>
             {
-                var p = Game1.UiPageManager.GetCurrentPage();
+                var p = Game1.UiPageManager?.GetCurrentPage();
                 return p == null ? "<null>" : p.GetType().Name + "#" + p.GetHashCode().ToString("X");
             }));
-            Line(sb, "registeredPages", SafeGet(() => Game1.UiPageManager.InsideElement.Count.ToString()));
-            Line(sb, "overlayMenuOpen", SafeGet(() => Game1.GameManager.InGameOverlay.MenuIsOpen().ToString()));
+            Line(sb, "registeredPages", SafeGet(() => Game1.UiPageManager?.InsideElement?.Count.ToString()));
+            Line(sb, "overlayMenuOpen", SafeGet(() => Game1.GameManager?.InGameOverlay?.MenuIsOpen().ToString()));
         }
 
         private static void AppendGameState(StringBuilder sb)
         {
-            Line(sb, "saveSlot", SafeGet(() => Game1.GameManager.SaveSlot.ToString()));
-            Line(sb, "saveName", SafeGet(() => Game1.GameManager.SaveName));
+            Line(sb, "saveSlot", SafeGet(() => Game1.GameManager?.SaveSlot.ToString()));
+            Line(sb, "saveName", SafeGet(() => Game1.GameManager?.SaveName));
             Line(sb, "map", SafeGet(() => Map.MapManager.ObjLink?.SaveMap));
             Line(sb, "playerPos", SafeGet(() =>
                 Map.MapManager.ObjLink == null ? "<null link>"

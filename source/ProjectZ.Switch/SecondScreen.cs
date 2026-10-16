@@ -113,7 +113,12 @@ namespace ProjectZ.InGame.Things
 
                 if (_pixel == null)
                 {
-                    _pixel = new Texture2D(Game1.Graphics.GraphicsDevice, 1, 1);
+                    // "?." a propósito: un deref nulo aquí mata el proceso, no lanza, así que
+                    // el catch de abajo no serviría de nada.
+                    var device = Game1.Graphics?.GraphicsDevice;
+                    if (device == null)
+                        return;
+                    _pixel = new Texture2D(device, 1, 1);
                     _pixel.SetData(new[] { Color.White });
                 }
 
