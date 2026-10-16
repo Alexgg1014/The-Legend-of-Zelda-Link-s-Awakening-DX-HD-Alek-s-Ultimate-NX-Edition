@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>false</ImplicitUsings>
+    <AssemblyName>UpdaterTest</AssemblyName>
+    <RootNamespace>UpdaterTest</RootNamespace>
+    <DefineConstants>$(DefineConstants);SWITCH</DefineConstants>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <PortDir>$([System.IO.Path]::GetFullPath("$(MSBuildThisFileDirectory)../../upstream204/ladxhd_game_source_code/ProjectZ.Switch"))</PortDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="ManifestTests.cs" />
+    <Compile Include="$(PortDir)\SwitchSha256.cs" />
+    <Compile Include="$(PortDir)\SwitchUpdateManifest.cs" />
+  </ItemGroup>
+</Project>

@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using ProjectZ.InGame.Graphics;
 using ProjectZ.InGame.Things;
 using ProjectZ.Switch.Install;
+using ProjectZ.Switch.Update;
 
 namespace ProjectZ
 {
@@ -45,6 +46,9 @@ namespace ProjectZ
 
         protected override void Initialize()
         {
+            // Solo mira si quedó un diario a medias de un intento anterior; no toca la red.
+            SwitchUpdater.OnBoot();
+
             var installer = new AssetInstaller(System.AppContext.BaseDirectory, OpenAssetBundle,
                 line => SwitchDiag.Log("install.log", line));
             var action = installer.Decide();
@@ -557,6 +561,9 @@ namespace ProjectZ
                 case SecondScreen.SettingsRow.UiLarge:
                     SwitchSettings.UiLarge = SwitchSettings.UiLarge != 0 ? 0 : 1;
                     break;
+                case SecondScreen.SettingsRow.Update:
+                    ApplyUpdateRow();
+                    return;                     // no hay nada que guardar en SwitchSettings
                 case SecondScreen.SettingsRow.Optimized:
                     if (!SecondScreen.OptimizedArmed)
                     {
@@ -588,6 +595,37 @@ namespace ProjectZ
             }
             SwitchSettings.Save();
             SwitchDiag.Log("secondscreen.log", "ajustes: " + SecondScreen.SettingsLabel(row) + " -> " + SecondScreen.SettingsValue(row));
+        }
+
+        /// <summary>
+        /// Fila ACTUALIZAR tocada. Mientras el updater está trabajando no hace nada (la fila ya
+        /// enseña el progreso). Con una versión disponible pide confirmación de dos toques, como
+        /// AJUSTES OPTIMIZADOS: instalar sobrescribe el NRO que estás ejecutando y eso no puede
+        /// dispararse por un roce. En cualquier otro estado, vuelve a comprobar.
+        /// </summary>
+        private void ApplyUpdateRow()
+        {
+            if (SwitchUpdater.Busy || SwitchUpdater.State == SwitchUpdater.Status.InstalledRestart)
+                return;
+
+            if (SwitchUpdater.State == SwitchUpdater.Status.Available)
+            {
+                if (!SecondScreen.UpdateArmed)
+                {
+                    SecondScreen.UpdateArmedUntilMs =
+                        System.Environment.TickCount64 + SecondScreen.OptimizedArmMs;
+                    SwitchDiag.Log("secondscreen.log", "updater: pidiendo confirmacion para instalar");
+                    return;
+                }
+                SecondScreen.UpdateArmedUntilMs = 0;
+                SwitchDiag.Log("secondscreen.log", "updater: instalando " + (SwitchUpdater.LatestVersion ?? "?"));
+                SwitchUpdater.StartDownloadAndInstall();
+                return;
+            }
+
+            SecondScreen.UpdateArmedUntilMs = 0;
+            SwitchDiag.Log("secondscreen.log", "updater: comprobando");
+            SwitchUpdater.StartCheck();
         }
 
         /// <summary>

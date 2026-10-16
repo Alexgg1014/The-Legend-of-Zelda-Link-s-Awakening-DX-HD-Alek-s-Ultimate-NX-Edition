@@ -6,6 +6,7 @@ using ProjectZ.InGame.Controls;
 using ProjectZ.InGame.GameObjects.Base;
 using ProjectZ.InGame.Graphics;
 using ProjectZ.InGame.SaveLoad;
+using ProjectZ.Switch.Update;
 
 namespace ProjectZ.InGame.Things
 {
@@ -708,8 +709,9 @@ namespace ProjectZ.InGame.Things
             HudSize = 6,
             UiLarge = 7,
             Optimized = 8,
+            Update = 9,
         }
-        public const int SettingsRowCount = 9;
+        public const int SettingsRowCount = 10;
 
         /// <summary>
         /// Confirmación de AJUSTES OPTIMIZADOS: el primer toque arma la fila durante unos
@@ -719,7 +721,17 @@ namespace ProjectZ.InGame.Things
         public static long OptimizedArmedUntilMs;
         public static bool OptimizedArmed => Environment.TickCount64 < OptimizedArmedUntilMs;
         public const int OptimizedArmMs = 4000;
-        private const int SettingsRowH = 44, SettingsRowGap = 4, SettingsTop = 6;
+
+        /// <summary>
+        /// Misma confirmación de dos toques para ACTUALIZAR: sobrescribir el NRO que estás
+        /// ejecutando no puede pasar por un roce sin querer en la pantalla.
+        /// </summary>
+        public static long UpdateArmedUntilMs;
+        public static bool UpdateArmed => Environment.TickCount64 < UpdateArmedUntilMs;
+
+        // 10 filas tienen que caber en MainH=468: 5 + 9*45 + 42 = 452. Con las cotas de 9 filas
+        // (44/4/6) la décima se salía por abajo 14 unidades.
+        private const int SettingsRowH = 42, SettingsRowGap = 3, SettingsTop = 5;
 
         public static Rectangle SettingsRowRect(Rectangle main, Rectangle panel, int i)
         {
@@ -743,7 +755,42 @@ namespace ProjectZ.InGame.Things
                 case SettingsRow.Render:   return SwitchStrings.Get("resolution");
                 case SettingsRow.HudSize:  return SwitchStrings.Get("panel_hud");
                 case SettingsRow.UiLarge:  return SwitchStrings.Get("game_ui");
+                case SettingsRow.Update:   return SwitchStrings.Get("update");
                 default:                   return SwitchStrings.Get("optimized");
+            }
+        }
+
+        /// <summary>
+        /// Valor de la fila ACTUALIZAR. Es lo único que el jugador ve del updater, así que dice
+        /// en todo momento en qué fase va: sin red no se le enseña un error, solo que no hay
+        /// conexión — el juego instalado sigue entero.
+        /// </summary>
+        private static string UpdateValue()
+        {
+            switch (SwitchUpdater.State)
+            {
+                case SwitchUpdater.Status.Checking:
+                    return SwitchStrings.Get("upd_checking");
+                case SwitchUpdater.Status.Unknown:
+                    return SwitchStrings.Get("upd_offline");
+                case SwitchUpdater.Status.UpToDate:
+                    return SwitchStrings.Get("upd_uptodate");
+                case SwitchUpdater.Status.Available:
+                    return UpdateArmed
+                        ? SwitchStrings.Get("confirm")
+                        : SwitchStrings.Get("upd_available", SwitchUpdater.LatestVersion ?? "?");
+                case SwitchUpdater.Status.Downloading:
+                    return (SwitchUpdater.ProgressPermille / 10) + "%";
+                case SwitchUpdater.Status.Verifying:
+                    return SwitchStrings.Get("upd_verifying");
+                case SwitchUpdater.Status.Installing:
+                    return SwitchStrings.Get("upd_installing");
+                case SwitchUpdater.Status.InstalledRestart:
+                    return SwitchStrings.Get("upd_restart");
+                case SwitchUpdater.Status.Failed:
+                    return SwitchStrings.Get("upd_failed");
+                default:
+                    return SwitchStrings.Get("upd_check");
             }
         }
 
@@ -759,6 +806,7 @@ namespace ProjectZ.InGame.Things
                 case SettingsRow.Render:   return SwitchStrings.Get(SwitchSettings.Render == 720 ? "res_fast" : "res_sharp");
                 case SettingsRow.HudSize:  return SwitchStrings.Get(SwitchSettings.PanelHudLarge != 0 ? "large" : "normal");
                 case SettingsRow.UiLarge:  return SwitchStrings.Get(SwitchSettings.UiLarge != 0 ? "large" : "normal");
+                case SettingsRow.Update:   return UpdateValue();
                 default:
                     if (OptimizedArmed) return SwitchStrings.Get(SwitchSettings.Optimized != 0 ? "undo_confirm" : "confirm");
                     return SwitchStrings.Get(SwitchSettings.Optimized != 0 ? "applied" : "apply");

@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "version": "1.2.0",
+  "channel": "stable",
+  "nro_url": "https://github.com/Alexgg1014/The-Legend-of-Zelda-Link-s-Awakening-DX-HD-Alek-s-Ultimate-NX-Edition/releases/download/v1.2.0/ProjectZ.Switch.nro",
+  "nro_sha256": "af36c837068b9b73be512d38e8833d8ff9f12b157bec2c99d4f17cad6b97b886",
+  "nro_size": 53458292,
+  "min_updater_schema": 1,
+  "changelog": [
+    "Rebased onto bighead's upstream v2.0.9",
+    "In-app updater: check, download and install from the console",
+    "Switch video options and the story guide now speak six languages",
+    "Boomerang, Angler Fish heart container and burned Urchin fixes from upstream"
+  ]
+}

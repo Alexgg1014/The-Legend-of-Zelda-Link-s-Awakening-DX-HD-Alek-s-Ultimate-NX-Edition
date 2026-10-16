@@ -33,6 +33,7 @@
 - **Sidebar HUD** on the panel (hearts, equipped items in the button layout, rupees, keys) so the game HUD can be hidden in Flip Grip.
 - **Switch options inside the game's own menu** — Pause → Settings → Video: resolution, fps limit, Flip Grip, hide HUD, large UI.
 - Panel **and** the Switch rows in the game's own Video menu translated to **English, Spanish, Portuguese, French, German and Italian** (follows the game language). The story guide is in all six too, using each language's official place, dungeon and character names from the game's own files.
+- **In-app updater** (new in v1.2) — check, download and install a new version from the companion panel, without a PC. The download is checked against a size and SHA-256 pinned in a manifest, a verified backup of your current NRO is made first, and any failure restores it. See [Updating](#updating).
 - Zero new art: everything on the panel is drawn from the game's own sprites, fonts and colors (respects your LAHDMods).
 
 ### Requirements
@@ -75,7 +76,32 @@ Everything else is the game's own controls.
 
 ### Updating
 
-Each release ships the NRO **with the patches of the upstream version it was built for embedded** (with bighead's permission). When bighead releases a new version, this port gets rebased and re-released. To update, just replace `ProjectZ.Switch.nro`: if the new NRO needs newer assets, it regenerates `Content`/`Data` from `original/` on the next start (that's why it's worth keeping `original/`). Manual installs (patcher on PC) keep working as before: use the patcher version named in the release notes.
+**Since v1.2 the port updates itself from the console.** Open the companion panel, go to
+**⚙ SETTINGS → UPDATE** and tap the row:
+
+1. It fetches a small manifest from this repository over HTTPS. No connection, or GitHub
+   unreachable? It just says "no connection" and nothing else happens — the installed game is
+   untouched.
+2. If there is a newer version, the row shows it. Tap **twice** to confirm (overwriting the NRO
+   you are running is not something a stray touch should start).
+3. It downloads the new NRO, checks its size **and SHA-256 against the manifest**, makes a
+   **verified backup** of your current NRO as `ProjectZ.Switch.bak` next to it, installs, and
+   verifies again. If anything goes wrong at any point, the backup is restored.
+4. When it says "done", close the game and launch it again.
+
+The console's own TLS and certificate store are used, so there are no bundled certificates. The
+download is only ever accepted from `github.com` / `*.githubusercontent.com` over HTTPS.
+
+If the new NRO needs newer assets, it regenerates `Content`/`Data` from `original/` on the next
+start — that is why it is worth keeping `original/`.
+
+**Coming from v1.1.0 or v1.0.0?** Those builds have no updater, so this one time you still
+replace `ProjectZ.Switch.nro` by hand. After that the console does it.
+
+Manual installs (patcher on PC) keep working as before: use the patcher version named in the
+release notes. Each release ships the NRO **with the patches of the upstream version it was
+built for embedded** (with bighead's permission); when bighead releases a new version, this port
+gets rebased and re-released.
 
 ### Building
 
@@ -112,6 +138,7 @@ This port was developed by Alexgg1014 **with Claude (Anthropic) as a coding assi
 - **HUD en la barra lateral** del panel (corazones, objetos equipados en la forma de los botones, rupias, llaves), para poder ocultar el HUD del juego en Flip Grip.
 - **Opciones Switch dentro del menú del juego**: Pausa → Ajustes → Vídeo: resolución, límite de fps, Flip Grip, ocultar HUD, UI grande.
 - El panel **y** las filas de Switch del menú Vídeo del propio juego, traducidos a **inglés, español, portugués, francés, alemán e italiano** (siguen el idioma del juego). La guía de historia también está en los seis, con los nombres oficiales de lugares, mazmorras y personajes de cada idioma, sacados de los ficheros del propio juego.
+- **Updater in-app** (nuevo en la v1.2) — comprueba, descarga e instala una versión nueva desde el panel companion, sin pasar por el PC. La descarga se comprueba contra el tamaño y el SHA-256 fijados en un manifiesto, antes se hace una copia de seguridad verificada de tu NRO actual, y cualquier fallo la restaura. Ver [Actualizaciones](#actualizaciones).
 - Cero arte nuevo: todo el panel se dibuja con los sprites, fuentes y colores del propio juego (respeta tus LAHDMods).
 
 ### Requisitos
@@ -154,7 +181,31 @@ Lo demás son los controles del juego.
 
 ### Actualizaciones
 
-Cada release lleva el NRO **con los parches de la versión de upstream para la que se compiló embebidos** (con permiso de bighead). Cuando bighead publique versión nueva, el port se rebasa y se vuelve a publicar. Para actualizar basta con sustituir `ProjectZ.Switch.nro`: si el NRO nuevo necesita assets más nuevos, regenera `Content`/`Data` desde `original/` en el siguiente arranque (por eso conviene conservar `original/`). Las instalaciones manuales (patcher en PC) siguen funcionando igual: usa la versión del patcher que digan las notas de la release.
+**Desde la v1.2 el port se actualiza solo desde la consola.** Abre el panel companion, vete a
+**⚙ AJUSTES → ACTUALIZAR** y toca la fila:
+
+1. Se baja un manifiesto pequeño de este repositorio por HTTPS. ¿Sin conexión, o GitHub caído?
+   Pone "sin conexión" y ya está — el juego instalado no se toca.
+2. Si hay versión nueva, la fila la enseña. Toca **dos veces** para confirmar (sobrescribir el
+   NRO que estás ejecutando no puede dispararse por un roce en la pantalla).
+3. Descarga el NRO nuevo, comprueba su tamaño **y su SHA-256 contra el manifiesto**, hace una
+   **copia de seguridad verificada** de tu NRO actual como `ProjectZ.Switch.bak` al lado,
+   instala y vuelve a verificar. Si algo falla en cualquier punto, restaura la copia.
+4. Cuando diga "listo", cierra el juego y vuelve a lanzarlo.
+
+Se usa el TLS y el almacén de certificados de la propia consola, así que no hay certificados
+embebidos. La descarga solo se acepta desde `github.com` / `*.githubusercontent.com` por HTTPS.
+
+Si el NRO nuevo necesita assets más nuevos, regenera `Content`/`Data` desde `original/` en el
+siguiente arranque (por eso conviene conservar `original/`).
+
+**¿Vienes de la v1.1.0 o la v1.0.0?** Esas no llevan updater, así que esta vez todavía tienes
+que sustituir `ProjectZ.Switch.nro` a mano. A partir de ahí lo hace la consola.
+
+Las instalaciones manuales (patcher en PC) siguen funcionando igual: usa la versión del patcher
+que digan las notas de la release. Cada release lleva el NRO **con los parches de la versión de
+upstream para la que se compiló embebidos** (con permiso de bighead); cuando bighead publique
+versión nueva, el port se rebasa y se vuelve a publicar.
 
 ### Transparencia: hecho con IA
 

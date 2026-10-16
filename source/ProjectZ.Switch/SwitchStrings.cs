@@ -33,6 +33,12 @@ namespace ProjectZ.InGame.Things
                 ["tip_flip"] = "Portrait console: game on top, companion panel below. Also L+R+X.",
                 ["tip_hidehud"] = "The panel sidebar already shows hearts, items and rupees.",
                 ["tip_uilarge"] = "One extra UI scale step at 720. The pause menu may overflow the sides slightly.",
+                // Updater in-app (fila ACTUALIZAR de AJUSTES).
+                ["update"] = "UPDATE", ["upd_check"] = "CHECK", ["upd_checking"] = "CHECKING...",
+                ["upd_offline"] = "NO CONNECTION", ["upd_uptodate"] = "UP TO DATE",
+                ["upd_available"] = "v{0} - TAP TO INSTALL", ["upd_verifying"] = "VERIFYING",
+                ["upd_installing"] = "INSTALLING", ["upd_restart"] = "DONE - RESTART THE GAME",
+                ["upd_failed"] = "FAILED - TAP TO RETRY",
             },
             ["esp"] = new Dictionary<string, string>
             {
@@ -54,6 +60,11 @@ namespace ProjectZ.InGame.Things
                 ["tip_flip"] = "Consola en vertical: juego arriba, panel companion abajo. Tambien L+R+X.",
                 ["tip_hidehud"] = "La barra lateral del panel ya lleva corazones, objetos y rupias.",
                 ["tip_uilarge"] = "Un paso mas de escala de UI a 720. El menu de pausa puede salirse un poco por los lados.",
+                ["update"] = "ACTUALIZAR", ["upd_check"] = "COMPROBAR", ["upd_checking"] = "COMPROBANDO...",
+                ["upd_offline"] = "SIN CONEXION", ["upd_uptodate"] = "AL DIA",
+                ["upd_available"] = "v{0} - TOCA PARA INSTALAR", ["upd_verifying"] = "VERIFICANDO",
+                ["upd_installing"] = "INSTALANDO", ["upd_restart"] = "LISTO - REINICIA EL JUEGO",
+                ["upd_failed"] = "FALLO - TOCA PARA REINTENTAR",
             },
             ["por"] = new Dictionary<string, string>
             {
@@ -75,6 +86,11 @@ namespace ProjectZ.InGame.Things
                 ["tip_flip"] = "Console na vertical: jogo em cima, painel companion embaixo. Tambem L+R+X.",
                 ["tip_hidehud"] = "A barra lateral do painel ja mostra coracoes, itens e rubis.",
                 ["tip_uilarge"] = "Um passo a mais de escala de UI a 720. O menu de pausa pode passar um pouco das bordas.",
+                ["update"] = "ATUALIZAR", ["upd_check"] = "VERIFICAR", ["upd_checking"] = "VERIFICANDO...",
+                ["upd_offline"] = "SEM CONEXAO", ["upd_uptodate"] = "EM DIA",
+                ["upd_available"] = "v{0} - TOQUE PARA INSTALAR", ["upd_verifying"] = "CONFERINDO",
+                ["upd_installing"] = "INSTALANDO", ["upd_restart"] = "PRONTO - REINICIE O JOGO",
+                ["upd_failed"] = "FALHOU - TOQUE PARA TENTAR DE NOVO",
             },
             ["fre"] = new Dictionary<string, string>
             {
@@ -96,6 +112,11 @@ namespace ProjectZ.InGame.Things
                 ["tip_flip"] = "Console a la verticale : jeu en haut, panneau companion en bas. Aussi L+R+X.",
                 ["tip_hidehud"] = "La barre laterale du panneau affiche deja coeurs, objets et rubis.",
                 ["tip_uilarge"] = "Un cran de plus d'echelle d'UI en 720. Le menu pause peut deborder un peu sur les cotes.",
+                ["update"] = "MISE A JOUR", ["upd_check"] = "VERIFIER", ["upd_checking"] = "VERIFICATION...",
+                ["upd_offline"] = "PAS DE CONNEXION", ["upd_uptodate"] = "A JOUR",
+                ["upd_available"] = "v{0} - TOUCHEZ POUR INSTALLER", ["upd_verifying"] = "VERIFICATION",
+                ["upd_installing"] = "INSTALLATION", ["upd_restart"] = "FINI - RELANCEZ LE JEU",
+                ["upd_failed"] = "ECHEC - TOUCHEZ POUR REESSAYER",
             },
             ["deu"] = new Dictionary<string, string>
             {
@@ -117,6 +138,11 @@ namespace ProjectZ.InGame.Things
                 ["tip_flip"] = "Konsole hochkant: Spiel oben, Companion-Panel unten. Auch L+R+X.",
                 ["tip_hidehud"] = "Die Seitenleiste des Panels zeigt bereits Herzen, Items und Rubine.",
                 ["tip_uilarge"] = "Eine UI-Stufe groesser bei 720. Das Pausenmenue kann seitlich leicht ueberstehen.",
+                ["update"] = "UPDATE", ["upd_check"] = "PRUEFEN", ["upd_checking"] = "PRUEFE...",
+                ["upd_offline"] = "KEINE VERBINDUNG", ["upd_uptodate"] = "AKTUELL",
+                ["upd_available"] = "v{0} - TIPPEN ZUM INSTALLIEREN", ["upd_verifying"] = "PRUEFE DATEI",
+                ["upd_installing"] = "INSTALLIERE", ["upd_restart"] = "FERTIG - SPIEL NEU STARTEN",
+                ["upd_failed"] = "FEHLER - TIPPEN ZUM WIEDERHOLEN",
             },
             ["ita"] = new Dictionary<string, string>
             {
@@ -138,6 +164,11 @@ namespace ProjectZ.InGame.Things
                 ["tip_flip"] = "Console in verticale: gioco sopra, pannello companion sotto. Anche L+R+X.",
                 ["tip_hidehud"] = "La barra laterale del pannello mostra gia cuori, oggetti e rupie.",
                 ["tip_uilarge"] = "Un passo in piu di scala UI a 720. Il menu di pausa puo sporgere un poco ai lati.",
+                ["update"] = "AGGIORNA", ["upd_check"] = "CONTROLLA", ["upd_checking"] = "CONTROLLO...",
+                ["upd_offline"] = "NESSUNA CONNESSIONE", ["upd_uptodate"] = "AGGIORNATO",
+                ["upd_available"] = "v{0} - TOCCA PER INSTALLARE", ["upd_verifying"] = "VERIFICA",
+                ["upd_installing"] = "INSTALLAZIONE", ["upd_restart"] = "FATTO - RIAVVIA IL GIOCO",
+                ["upd_failed"] = "ERRORE - TOCCA PER RIPROVARE",
             },
         };
 

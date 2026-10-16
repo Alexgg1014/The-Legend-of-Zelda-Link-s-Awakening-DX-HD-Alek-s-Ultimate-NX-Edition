@@ -20,7 +20,20 @@ SET "NATIVEAOT_FW=%ILC%\framework"
 SET "ARCH=-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -ftls-model=local-exec"
 SET "PROJECT=ProjectZ.Switch"
 
+REM  libcurl + mbedtls para el updater in-app (v1.2). C:\devkitpro se instalo a mano, sin
+REM  pacman, y solo trae libz: las portlibs completas estan en la instalacion de devkitPro
+REM  que hay en D:, que es la misma que usa el port de Minish Cap para su updater. Las dos
+REM  comparten el MISMO libnx (mismo libnx.a byte a byte), asi que mezclarlas es seguro.
+REM  Si algun dia se instala switch-curl en C:\devkitpro, basta apuntar CURLPREFIX ahi.
+SET "CURLPREFIX=D:\XboxGames\Switch\devkitPro\portlibs\switch"
+
 cd /d "%~dp0\.."
+
+if not exist "%CURLPREFIX%\lib\libcurl.a" (
+  echo [ERROR] No se encuentra libcurl.a en %CURLPREFIX%\lib
+  echo         El updater in-app lo necesita. Revisa CURLPREFIX arriba.
+  exit /b 1
+)
 
 if not exist "%PROJECT%\obj" mkdir "%PROJECT%\obj"
 if not exist "%PROJECT%\bin\SwitchRelease" mkdir "%PROJECT%\bin\SwitchRelease"
@@ -73,6 +86,19 @@ echo ============================================
   %PROJECT%\libc_stubs.c
 if %errorlevel% neq 0 ( echo [ERROR] libc_stubs.c failed! & exit /b 1 )
 
+echo.
+echo ============================================
+echo  Step 2e: Compiling switch_net.c (updater)
+echo ============================================
+%GCC% %ARCH% -c -O2 ^
+  -isystem %DEVKITPRO%\libnx\include ^
+  -I%DEVKITPRO%\portlibs\switch\include ^
+  -I%CURLPREFIX%\include ^
+  -D__SWITCH__ -DCURL_STATICLIB ^
+  -o %PROJECT%\obj\switch_net.o ^
+  %PROJECT%\switch_net.c
+if %errorlevel% neq 0 ( echo [ERROR] switch_net.c failed! & exit /b 1 )
+
 echo Shims compiled OK
 
 echo.
@@ -92,6 +118,7 @@ echo ============================================
   %PROJECT%\obj\crypto_stubs.o ^
   %PROJECT%\obj\dlsym_table.o ^
   %PROJECT%\obj\libc_stubs.o ^
+  %PROJECT%\obj\switch_net.o ^
   %PROJECT%\obj\Release\net9.0\linux-arm64\native\ProjectZ.Switch.o ^
   %NATIVEAOT_SDK%\libbootstrapper.o ^
   %NATIVEAOT_SDK%\libRuntime.WorkstationGC.a ^
@@ -101,8 +128,10 @@ echo ============================================
   %NATIVEAOT_FW%\libSystem.Native.a ^
   %NATIVEAOT_FW%\libSystem.IO.Compression.Native.a ^
   -L%DEVKITPRO%\portlibs\switch\lib ^
+  -L%CURLPREFIX%\lib ^
   -L%DEVKITPRO%\libnx\lib ^
   -lSDL2 -lopenal -lEGL -lglapi -lGLESv2 -ldrm_nouveau ^
+  -lcurl -lmbedtls -lmbedx509 -lmbedcrypto ^
   -lnx -lpthread -lstdc++ -lm -lz ^
   -Wl,--allow-multiple-definition ^
   -pie -Wl,--gc-sections -Wl,-z,norelro -Wl,--eh-frame-hdr
@@ -111,7 +140,9 @@ echo LINK OK!
 
 echo.
 echo Converting to NRO...
-%DEVKITPRO%\tools\bin\nacptool.exe --create "Alek's Ultimate Zelda LA DX HD" "Alexgg1014" "1.1.0" %PROJECT%\bin\SwitchRelease\game.nacp
+REM  La version del NACP es la del PORT y tiene que ir a la par de SwitchUpdater.PortVersion:
+REM  es lo que el updater compara con el manifiesto.
+%DEVKITPRO%\tools\bin\nacptool.exe --create "Alek's Ultimate Zelda LA DX HD" "Alexgg1014" "1.2.0" %PROJECT%\bin\SwitchRelease\game.nacp
 SET "ICON_FLAG="
 if exist %PROJECT%\Icon.jpg SET "ICON_FLAG=--icon=%PROJECT%\Icon.jpg"
 %DEVKITPRO%\tools\bin\elf2nro.exe %PROJECT%\bin\SwitchRelease\ProjectZ.Switch.elf %PROJECT%\bin\SwitchRelease\ProjectZ.Switch.nro --nacp=%PROJECT%\bin\SwitchRelease\game.nacp %ICON_FLAG%

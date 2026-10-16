@@ -1,10 +1,32 @@
-# v1.2.0 — upstream v2.0.9 and the port's UI in six languages
+# v1.2.0 — in-app updater, upstream v2.0.9, and the port's UI in six languages
 
 Built against **bighead's ladxhd_updated v2.0.9** (released 9 October 2026). If you are on
 v1.1.0, just replace the NRO: the first start notices the assets are from v2.0.8, re-patches
 your `original/` copy on the console (about a minute) and carries on. Your saves are untouched.
 
+**This is the last time you have to copy an NRO by hand.** From here on the port updates itself
+from the console.
+
 ## What's new
+
+### In-app updater
+
+Companion panel → **⚙ SETTINGS → UPDATE**. Tap the row and it checks this repository for a new
+version; tap twice to confirm and it downloads, verifies and installs it, right there on the
+console.
+
+What it does *not* do matters as much as what it does:
+
+- It never trusts the download. The manifest pins the exact **size and SHA-256** before a single
+  byte is fetched, and the file is checked against both afterwards.
+- It never touches the NRO you are running until a **verified backup** of it exists
+  (`ProjectZ.Switch.bak`, right next to it). If the install goes wrong, that backup goes back.
+- It never goes anywhere else: HTTPS only, `github.com` / `*.githubusercontent.com` only, using
+  the console's own TLS and certificate store (no bundled certificates).
+- Offline, it says "no connection" and stops. A console without wifi is not shown an error.
+
+The design is the one from the *Minish Cap* edition of this project, which has shipped it since
+its v1.3 — the parts that differ are the ones that had to.
 
 ### Up to date with upstream v2.0.9
 
